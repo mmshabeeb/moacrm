@@ -54,6 +54,7 @@
       this.form = document.getElementById('moa-chat-form');
       this.input = document.getElementById('moa-user-input');
       this.minimizeBtn = document.getElementById('moa-minimize-chat');
+      this.resetBtn = document.getElementById('moa-reset-chat');
 
       // Hidden Shopify Line Item Property fields
       this.props = {
@@ -84,6 +85,13 @@
         this.minimizeBtn.addEventListener('click', (e) => {
           e.stopPropagation();
           this.minimizePanel();
+        });
+      }
+
+      if (this.resetBtn) {
+        this.resetBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.resetSession();
         });
       }
 
@@ -216,6 +224,50 @@
         clearTimeout(this.idleTimeout);
         this.idleTimeout = null;
       }
+    }
+
+    resetSession() {
+      localStorage.removeItem(this.sessionKey);
+      this.sessionToken = `MOA-CUS-${Math.floor(100000 + Math.random() * 900000)}`;
+      localStorage.setItem(this.sessionKey, this.sessionToken);
+      this.isConfirmed = false;
+      this.userHasTexted = false;
+      this.lastSummary = null;
+
+      // Clear line item properties
+      if (this.props.id) { this.props.id.value = ''; this.props.id.setAttribute('disabled', 'disabled'); }
+      if (this.props.fit) { this.props.fit.value = ''; this.props.fit.setAttribute('disabled', 'disabled'); }
+      if (this.props.height) { this.props.height.value = ''; this.props.height.setAttribute('disabled', 'disabled'); }
+      if (this.props.bust) { this.props.bust.value = ''; this.props.bust.setAttribute('disabled', 'disabled'); }
+      if (this.props.length) { this.props.length.value = ''; this.props.length.setAttribute('disabled', 'disabled'); }
+      if (this.props.sleeve) { this.props.sleeve.value = ''; this.props.sleeve.setAttribute('disabled', 'disabled'); }
+      if (this.props.notes) { this.props.notes.value = ''; this.props.notes.setAttribute('disabled', 'disabled'); }
+
+      // Reset chat messages thread
+      if (this.messagesContainer) {
+        this.messagesContainer.innerHTML = `
+          <div class="moa-wa-bubble moa-wa-incoming">
+            <span class="moa-wa-author">MOA Designer</span>
+            <p style="margin:0;">Salam! Welcome to Mall of Abayas. I'm here to help tailor your ${this.productTitle}. May I know your height to start?</p>
+            <div class="moa-wa-meta"><span>Just now</span></div>
+          </div>
+        `;
+      }
+
+      // Reset backend session
+      try {
+        fetch(`${this.apiBase}/api/chat/reset`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sessionToken: this.sessionToken,
+            productTitle: this.productTitle,
+            productCategory: this.productCategory
+          })
+        }).catch(() => {});
+      } catch (e) {}
+
+      this.updateCartButtonState(this.isCustomising);
     }
 
     updateCartButtonState(isCustomising) {

@@ -61,7 +61,42 @@ export class MOAAIConversationEngine {
     productCategory?: string;
   }): Promise<ConversationTurnResult> {
     const { userMessage, history, currentRecord, productTitle, productCategory = 'abaya_standard' } = params;
-    const text = userMessage.toLowerCase();
+    const text = userMessage.toLowerCase().trim();
+
+    // 0. Reset or Start Over request
+    const isReset = /^(reset|start over|clear|new customisation|restart)\s*!?$/i.test(text);
+    if (isReset) {
+      const resetRecord: Partial<StructuredCustomisationRecord> = {
+        id: currentRecord.id || `MOA-CUS-${Math.floor(100000 + Math.random() * 900000)}`,
+        product_title: productTitle,
+        fit_preference: 'regular',
+        state: 'AI_HANDLING',
+        customisation_status: 'GATHERING',
+        customer_confirmed: false,
+        requires_extra_charge: false
+      };
+      return {
+        replyMessage: `Salam! I've cleared your previous entries so we can start fresh for **${productTitle}**. May I know your **height** to begin?`,
+        updatedState: 'AI_HANDLING',
+        customisationStatus: 'GATHERING',
+        updatedRecord: resetRecord,
+        showVerificationCard: false,
+        escalationTriggered: false
+      };
+    }
+
+    // 0.1 Pure greeting check (e.g. "hi", "hello", "salam")
+    const isPureGreeting = /^(hi|hello|hey|salam|salamualaykum|assalamu alaikum|good morning|good evening|marhaba)\s*!?$/i.test(text);
+    if (isPureGreeting) {
+      return {
+        replyMessage: `Salam! Welcome to Mall of Abayas. It’s lovely to have you here. I'd be delighted to help you find the perfect bespoke fit and customize your **${productTitle}**. May I know your **height** to start?`,
+        updatedState: 'AI_HANDLING',
+        customisationStatus: 'GATHERING',
+        updatedRecord: currentRecord,
+        showVerificationCard: false,
+        escalationTriggered: false
+      };
+    }
 
     // 1. Explicit escalation triggers
     if (text.includes('human') || text.includes('designer') || text.includes('speak to a person') || text.includes('talk to someone')) {

@@ -144,3 +144,32 @@ chatRouter.post('/confirm', async (req: Request, res: Response) => {
     return res.status(500).json({ error: 'Failed to confirm customisation' });
   }
 });
+
+/**
+ * POST /api/chat/reset
+ * Explicitly reset a customer's consultation session to a fresh state
+ */
+chatRouter.post('/reset', (req: Request, res: Response) => {
+  try {
+    const { sessionToken, productTitle, productCategory } = req.body;
+    if (sessionToken) {
+      activeSessions.set(sessionToken, {
+        record: {
+          id: `MOA-CUS-${Math.floor(100000 + Math.random() * 900000)}`,
+          product_title: productTitle || 'Mall of Abayas Product',
+          fit_preference: 'regular',
+          state: 'AI_HANDLING',
+          customisation_status: 'GATHERING',
+          customer_confirmed: false,
+          requires_extra_charge: false
+        },
+        history: [],
+        productTitle: productTitle || 'Mall of Abayas Product',
+        productCategory: productCategory || 'abaya_standard'
+      });
+    }
+    return res.json({ success: true, message: 'Session reset successfully' });
+  } catch (error: any) {
+    return res.status(500).json({ error: 'Failed to reset session' });
+  }
+});
