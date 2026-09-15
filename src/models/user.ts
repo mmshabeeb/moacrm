@@ -4,14 +4,22 @@ export interface MOAUser {
   id: string;
   name: string;
   email: string;
+  passwordHash?: string;
+  salt?: string;
   role: UserRole;
   status: 'ACTIVE' | 'INACTIVE';
   lastActive: string;
   createdAt: string;
 }
 
+export interface UserSession {
+  token: string;
+  user: Omit<MOAUser, 'passwordHash' | 'salt'>;
+  expiresAt: string;
+}
+
 export interface AuthContext {
-  currentUser: MOAUser;
+  currentUser: Omit<MOAUser, 'passwordHash' | 'salt'>;
   permissions: {
     canAccessConsultations: boolean;
     canAccessProduction: boolean;

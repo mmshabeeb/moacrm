@@ -11,6 +11,72 @@
 </head>
 <body>
 
+  <!-- Luxury Atelier CRM Authentication Overlay -->
+  <div id="moa-auth-screen" class="moa-auth-overlay">
+    <div class="moa-auth-card">
+      <div class="moa-auth-header">
+        <div class="moa-auth-brand-logo">👗</div>
+        <h1 class="moa-auth-title">MALL OF ABAYAS</h1>
+        <p class="moa-auth-subtitle">Atelier CRM & Bespoke Production Portal</p>
+      </div>
+
+      <div id="auth-error-alert" class="moa-auth-alert" style="display: none;"></div>
+
+      <form id="moa-login-form" onsubmit="handleLoginSubmit(event)">
+        <div class="moa-auth-field">
+          <label for="login-email">Email Address (Username)</label>
+          <div class="moa-input-wrapper">
+            <span class="moa-field-icon">✉️</span>
+            <input type="email" id="login-email" placeholder="name@mallofabayas.com" required autocomplete="email" />
+          </div>
+        </div>
+
+        <div class="moa-auth-field">
+          <label for="login-password">Password</label>
+          <div class="moa-input-wrapper">
+            <span class="moa-field-icon">🔒</span>
+            <input type="password" id="login-password" placeholder="Enter your password" required autocomplete="current-password" />
+            <button type="button" class="moa-toggle-pwd-btn" onclick="togglePasswordVisibility('login-password', this)">👁️</button>
+          </div>
+        </div>
+
+        <button type="submit" id="login-submit-btn" class="moa-auth-btn">
+          <span>Sign In to Atelier CRM</span> &rarr;
+        </button>
+      </form>
+
+      <div class="moa-auth-divider">
+        <span>QUICK DEMO ACCESS (1-CLICK LOGIN)</span>
+      </div>
+
+      <div class="moa-quick-roles">
+        <button type="button" class="moa-role-card" onclick="fillQuickLogin('admin@mallofabayas.com', 'Admin@MOA2026')">
+          <span class="role-badge role-admin">ADMIN</span>
+          <strong>Fatima (Master Admin)</strong>
+          <small>admin@mallofabayas.com</small>
+        </button>
+
+        <button type="button" class="moa-role-card" onclick="fillQuickLogin('noura.subadmin@mallofabayas.com', 'SubAdmin@MOA2026')">
+          <span class="role-badge role-subadmin">SUB-ADMIN</span>
+          <strong>Noura (Operations)</strong>
+          <small>noura.subadmin@mallofabayas.com</small>
+        </button>
+
+        <button type="button" class="moa-role-card" onclick="fillQuickLogin('aisha.designer@mallofabayas.com', 'Designer@MOA2026')">
+          <span class="role-badge role-designer">SENIOR DESIGNER</span>
+          <strong>Aisha (Consultant)</strong>
+          <small>aisha.designer@mallofabayas.com</small>
+        </button>
+
+        <button type="button" class="moa-role-card" onclick="fillQuickLogin('mariam.consultant@mallofabayas.com', 'Tailor@MOA2026')">
+          <span class="role-badge role-designer">SENIOR TAILOR</span>
+          <strong>Mariam (Consultant)</strong>
+          <small>mariam.consultant@mallofabayas.com</small>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Top Navigation Bar -->
   <header class="moa-navbar">
     <div class="moa-brand">
@@ -26,22 +92,20 @@
 
       <div class="moa-store-pill">
         <span class="moa-status-dot"></span>
-        <span>Store: <strong>moa-online.myshopify.com</strong></span>
+        <span>Store: <strong>in.mallofabayas.com</strong></span>
       </div>
 
-      <!-- User Role Selector & Profile -->
+      <!-- User Role Profile & Logout -->
       <div class="moa-user-profile-widget">
         <div class="moa-user-avatar" id="user-avatar-icon">F</div>
         <div class="moa-user-info">
           <span class="moa-user-name" id="user-display-name">Fatima Al-Nuaimi</span>
           <span class="moa-user-role-badge moa-role-admin" id="user-display-role">ADMIN</span>
         </div>
-        <select id="role-switcher-select" class="moa-role-select" onchange="handleSwitchUser(this.value)">
-          <option value="user_admin_1">Fatima (Admin - Full Access)</option>
-          <option value="user_subadmin_1">Noura (Sub-Admin - Chat & Ops)</option>
-          <option value="user_designer_1">Aisha (Senior Designer - Chat Only)</option>
-          <option value="user_designer_2">Mariam (Senior Designer - Chat Only)</option>
-        </select>
+        <button type="button" class="moa-btn-logout" onclick="handleLogout()" title="Sign out">
+          <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+          <span>Logout</span>
+        </button>
       </div>
     </div>
   </header>
@@ -552,8 +616,12 @@
           <input type="text" id="user-name-input" placeholder="e.g. Reem Designer" required />
         </div>
         <div class="moa-form-group">
-          <label>Email Address</label>
+          <label>Email Address (Username)</label>
           <input type="email" id="user-email-input" placeholder="reem.designer@mallofabayas.com" required />
+        </div>
+        <div class="moa-form-group">
+          <label>Initial Password</label>
+          <input type="password" id="user-password-input" placeholder="Set password (min 6 characters)" required />
         </div>
         <div class="moa-form-group">
           <label>Role</label>

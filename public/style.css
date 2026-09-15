@@ -1329,3 +1329,284 @@ html, body {
   background: #734921 !important;
 }
 
+/* =======================================================
+   LUXURY ATELIER CRM AUTHENTICATION STYLES
+   ======================================================= */
+.moa-auth-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: radial-gradient(circle at top, rgba(30, 20, 15, 0.95), rgba(10, 10, 10, 0.98));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 9999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  overflow-y: auto;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.moa-auth-overlay.moa-auth-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.moa-auth-card {
+  background: #ffffff;
+  width: 100%;
+  max-width: 460px;
+  border-radius: 20px;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(158, 109, 56, 0.25);
+  padding: 2.25rem 2rem;
+  animation: authSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes authSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.moa-auth-header {
+  text-align: center;
+  margin-bottom: 1.75rem;
+}
+
+.moa-auth-brand-logo {
+  font-size: 2.4rem;
+  margin-bottom: 0.5rem;
+  display: inline-block;
+  background: #fbf8f4;
+  width: 64px;
+  height: 64px;
+  line-height: 64px;
+  border-radius: 50%;
+  border: 1px solid #ebd9c8;
+}
+
+.moa-auth-title {
+  font-family: 'Cinzel', serif;
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: #111111;
+  letter-spacing: 2px;
+  margin: 0 0 0.35rem 0;
+}
+
+.moa-auth-subtitle {
+  font-size: 0.85rem;
+  color: #8b5a2b;
+  margin: 0;
+  font-weight: 500;
+}
+
+.moa-auth-alert {
+  background: #fee2e2;
+  border: 1px solid #ef4444;
+  color: #991b1b;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.84rem;
+  margin-bottom: 1.25rem;
+  font-weight: 500;
+}
+
+.moa-auth-field {
+  margin-bottom: 1.15rem;
+}
+
+.moa-auth-field label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #334155;
+  margin-bottom: 6px;
+}
+
+.moa-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.moa-field-icon {
+  position: absolute;
+  left: 12px;
+  font-size: 1rem;
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.moa-input-wrapper input {
+  width: 100%;
+  padding: 11px 40px 11px 38px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  font-size: 0.92rem;
+  font-family: inherit;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background: #f8fafc;
+}
+
+.moa-input-wrapper input:focus {
+  outline: none;
+  border-color: #8b5a2b;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(139, 90, 43, 0.15);
+}
+
+.moa-toggle-pwd-btn {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  font-size: 1rem;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.moa-toggle-pwd-btn:hover {
+  opacity: 1;
+}
+
+.moa-auth-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #111111 0%, #2a2018 100%);
+  color: #f7e7ce;
+  border: 1px solid #8b5a2b;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 1.25rem;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+.moa-auth-btn:hover {
+  background: linear-gradient(135deg, #2a2018 0%, #111111 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(139, 90, 43, 0.3);
+}
+
+.moa-auth-divider {
+  text-align: center;
+  position: relative;
+  margin: 1.75rem 0 1rem 0;
+}
+
+.moa-auth-divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #e2e8f0;
+}
+
+.moa-auth-divider span {
+  position: relative;
+  background: #ffffff;
+  padding: 0 10px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #94a3b8;
+  letter-spacing: 0.8px;
+}
+
+.moa-quick-roles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.moa-role-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 10px 12px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.moa-role-card:hover {
+  background: #fdfaf6;
+  border-color: #8b5a2b;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(139, 90, 43, 0.12);
+}
+
+.moa-role-card strong {
+  font-size: 0.8rem;
+  color: #0f172a;
+}
+
+.moa-role-card small {
+  font-size: 0.68rem;
+  color: #64748b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.moa-role-card .role-badge {
+  align-self: flex-start;
+  font-size: 0.62rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+
+.role-admin { background: #fee2e2; color: #991b1b; }
+.role-subadmin { background: #e0e7ff; color: #3730a3; }
+.role-designer { background: #dcfce7; color: #166534; }
+
+/* CRM Navbar User Logout Button */
+.moa-btn-logout {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.2s ease;
+  margin-left: 8px;
+}
+
+.moa-btn-logout:hover {
+  background: #fee2e2;
+  border-color: #fca5a5;
+  color: #b91c1c;
+}
+
+

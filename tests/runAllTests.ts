@@ -279,6 +279,52 @@ async function runTests() {
   assert(trainedPrompt.includes('alteration_rules'), 'Trained prompt includes safety alteration limits');
   assert(trainedPrompt.includes('senior designer'), 'Trained prompt includes escalation rules');
 
+  // --- Suite 9: CRM Authentication & User Security ---
+  console.log('\n🔐 [Suite 9: CRM Authentication, Email/Password & Sessions]');
+  const { authService } = await import('../src/services/authService');
+
+  // Valid admin login
+  const adminLogin = authService.login('admin@mallofabayas.com', 'Admin@MOA2026');
+  assert(adminLogin.success === true && !!adminLogin.session?.token, 'Admin logs in with email and password');
+  assert(adminLogin.session?.user.role === 'ADMIN', 'Admin session has ADMIN role');
+
+  // Validate session token
+  const tokenCheck = authService.validateSession(adminLogin.session!.token);
+  assert(tokenCheck.valid === true && tokenCheck.user?.email === 'admin@mallofabayas.com', 'Session token validates successfully');
+
+  // Invalid password rejection
+  const badLogin = authService.login('admin@mallofabayas.com', 'WrongPassword123');
+  assert(badLogin.success === false && badLogin.error === 'Invalid email address or password', 'Invalid password is rejected');
+
+  // Senior Designer login
+  const designerLogin = authService.login('aisha.designer@mallofabayas.com', 'Designer@MOA2026');
+  assert(designerLogin.success === true && designerLogin.session?.user.role === 'SENIOR_DESIGNER', 'Senior Designer logs in with role SENIOR_DESIGNER');
+  assert(designerLogin.permissions.canAccessProduction === false, 'Senior Designer permissions restrict production access');
+
+  // Create new user with password
+  const newUserRes = authService.createUser({
+    name: 'Hessa Consultant',
+    email: 'hessa.designer@mallofabayas.com',
+    password: 'Hessa@MOA2026',
+    role: 'SENIOR_DESIGNER'
+  });
+  assert(newUserRes.success === true, 'Admin can create new user with email and password');
+
+  // Login with new user
+  const hessaLogin = authService.login('hessa.designer@mallofabayas.com', 'Hessa@MOA2026');
+  assert(hessaLogin.success === true, 'Newly created user can log in with their credentials');
+
+  // Password reset
+  const resetRes = authService.resetUserPassword(newUserRes.user.id, 'NewSecurePassword@2026');
+  assert(resetRes.success === true, 'Password reset succeeds');
+  const afterResetLogin = authService.login('hessa.designer@mallofabayas.com', 'NewSecurePassword@2026');
+  assert(afterResetLogin.success === true, 'User can log in with new password after reset');
+
+  // Logout session invalidation
+  authService.logout(adminLogin.session!.token);
+  const loggedOutCheck = authService.validateSession(adminLogin.session!.token);
+  assert(loggedOutCheck.valid === false, 'Logged out session token is invalidated');
+
   console.log(`\n====================================================`);
   console.log(`🎉 Test Results: ${passed} Passed, ${failed} Failed`);
   console.log(`====================================================\n`);

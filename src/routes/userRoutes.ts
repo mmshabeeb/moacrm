@@ -1,147 +1,102 @@
 import { Router, Request, Response } from 'express';
-import { MOAUser, UserRole, getRolePermissions } from '../models/user';
+import { UserRole } from '../models/user';
+import { authService } from '../services/authService';
 
 export const userRouter = Router();
 
-// In-memory seed users
-let usersDb: MOAUser[] = [
-  {
-    id: 'user_admin_1',
-    name: 'Fatima Al-Nuaimi',
-    email: 'fatima.admin@mallofabayas.com',
-    role: 'ADMIN',
-    status: 'ACTIVE',
-    lastActive: new Date().toISOString(),
-    createdAt: new Date(Date.now() - 30 * 86400000).toISOString()
-  },
-  {
-    id: 'user_subadmin_1',
-    name: 'Noura Al-Kuwari',
-    email: 'noura.subadmin@mallofabayas.com',
-    role: 'SUB_ADMIN',
-    status: 'ACTIVE',
-    lastActive: new Date().toISOString(),
-    createdAt: new Date(Date.now() - 20 * 86400000).toISOString()
-  },
-  {
-    id: 'user_designer_1',
-    name: 'Aisha Designer',
-    email: 'aisha.designer@mallofabayas.com',
-    role: 'SENIOR_DESIGNER',
-    status: 'ACTIVE',
-    lastActive: new Date().toISOString(),
-    createdAt: new Date(Date.now() - 14 * 86400000).toISOString()
-  },
-  {
-    id: 'user_designer_2',
-    name: 'Mariam Senior Tailor',
-    email: 'mariam.consultant@mallofabayas.com',
-    role: 'SENIOR_DESIGNER',
-    status: 'ACTIVE',
-    lastActive: new Date(Date.now() - 3600000).toISOString(),
-    createdAt: new Date(Date.now() - 7 * 86400000).toISOString()
-  }
-];
-
-let currentActiveUser: MOAUser = usersDb[0]; // Default to Admin
-
-/**
- * GET /api/users/current
- * Get current session user and active permissions
- */
-userRouter.get('/current', (req: Request, res: Response) => {
-  res.json({
-    success: true,
-    user: currentActiveUser,
-    permissions: getRolePermissions(currentActiveUser.role)
-  });
-});
-
-/**
- * POST /api/users/switch-user
- * Switch active role / user (for testing & role demonstration)
- */
-userRouter.post('/switch-user', (req: Request, res: Response) => {
-  const { userId } = req.body;
-  const user = usersDb.find(u => u.id === userId);
-  if (!user) {
-    return res.status(404).json({ error: 'User not found' });
-  }
-
-  currentActiveUser = user;
-  res.json({
-    success: true,
-    message: `Switched user to ${user.name} (${user.role})`,
-    user: currentActiveUser,
-    permissions: getRolePermissions(currentActiveUser.role)
-  });
-});
-
 /**
  * GET /api/users
- * List all users (Admin only)
+ * List all users
  */
 userRouter.get('/', (req: Request, res: Response) => {
+  const users = authService.getAllUsers();
   res.json({
     success: true,
-    count: usersDb.length,
-    users: usersDb
+    count: users.length,
+    users
   });
 });
 
 /**
  * POST /api/users
- * Create new user (Admin only)
+ * Create new user with email, name, role and initial password
  */
 userRouter.post('/', (req: Request, res: Response) => {
-  const { name, email, role } = req.body;
+  const { name, email, password, role } = req.body;
   if (!name || !email || !role) {
     return res.status(400).json({ error: 'Name, email, and role are required' });
   }
 
-  const newUser: MOAUser = {
-    id: `user_${Date.now()}`,
+  const result = authService.createUser({
     name,
     email,
-    role: (role === 'ADMIN' ? 'ADMIN' : 'SENIOR_DESIGNER') as UserRole,
-    status: 'ACTIVE',
-    lastActive: 'Never',
-    createdAt: new Date().toISOString()
-  };
+    password,
+    role: role as UserRole
+  });
 
-  usersDb.push(newUser);
-  res.json({ success: true, message: 'User created successfully', user: newUser, users: usersDb });
+  if (!result.success) {
+    return res.status(400).json({ error: result.error });
+  }
+
+  res.json({
+    success: true,
+    message: 'User created successfully',
+    user: result.user,
+    users: authService.getAllUsers()
+  });
 });
 
 /**
  * PATCH /api/users/:id/role
- * Update user role
+ * Update user role or status
  */
 userRouter.patch('/:id/role', (req: Request, res: Response) => {
   const { id } = req.params;
   const { role, status } = req.body;
 
-  const user = usersDb.find(u => u.id === id);
-  if (!user) {
-    return res.status(404).json({ error: 'User not found' });
+  const result = authService.updateUserRole(id, role as UserRole, status);
+  if (!result.success) {
+    return res.status(404).json({ error: result.error });
   }
 
-  if (role) user.role = role as UserRole;
-  if (status) user.status = status;
+  res.json({
+    success: true,
+    message: 'User updated successfully',
+    user: result.user,
+    users: authService.getAllUsers()
+  });
+});
 
-  res.json({ success: true, message: 'User updated', user, users: usersDb });
+/**
+ * POST /api/users/:id/reset-password
+ * Reset user password by Admin
+ */
+userRouter.post('/:id/reset-password', (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { newPassword } = req.body;
+
+  if (!newPassword || newPassword.length < 6) {
+    return res.status(400).json({ error: 'Password must be at least 6 characters long' });
+  }
+
+  const result = authService.resetUserPassword(id, newPassword);
+  if (!result.success) {
+    return res.status(404).json({ error: result.error });
+  }
+
+  res.json({ success: true, message: 'Password reset successfully' });
 });
 
 /**
  * DELETE /api/users/:id
- * Delete or deactivate user
+ * Remove user
  */
 userRouter.delete('/:id', (req: Request, res: Response) => {
   const { id } = req.params;
-  if (id === currentActiveUser.id) {
-    return res.status(400).json({ error: 'Cannot delete currently active user' });
+  const result = authService.deleteUser(id);
+  if (!result.success) {
+    return res.status(404).json({ error: result.error });
   }
 
-  usersDb = usersDb.filter(u => u.id !== id);
-  res.json({ success: true, message: 'User removed', users: usersDb });
+  res.json({ success: true, message: 'User removed', users: authService.getAllUsers() });
 });

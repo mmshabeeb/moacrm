@@ -40,53 +40,276 @@ let recordSeconds = 0;
 let allStaffUsers = [];
 
 // =======================================================
-// INITIALIZATION
+// INITIALIZATION & AUTHENTICATION
 // =======================================================
 document.addEventListener('DOMContentLoaded', async () => {
   initTabs();
-  await loadCurrentAuth();
-  await loadUsersList();
-  initConsultations();
-  initAIChats();
-  loadProductionOrders();
-  loadAddons();
+  const isAuthenticated = await loadCurrentAuth();
+  if (isAuthenticated) {
+    await loadUsersList();
+    initConsultations();
+    initAIChats();
+    loadProductionOrders();
+    loadAddons();
+  }
 });
 
-// Load Current User & Permissions from Backend
-async function loadCurrentAuth() {
+// Fill Quick Demo Login Credentials
+function fillQuickLogin(email, password) {
+  const emailInput = document.getElementById('login-email');
+  const pwdInput = document.getElementById('login-password');
+  if (emailInput) emailInput.value = email;
+  if (pwdInput) pwdInput.value = password;
+  
+  const form = document.getElementById('moa-login-form');
+  if (form) {
+    const submitBtn = document.getElementById('login-submit-btn');
+    if (submitBtn) submitBtn.click();
+  }
+}
+
+// Toggle Password Field Visibility
+function togglePasswordVisibility(fieldId, btn) {
+  const field = document.getElementById(fieldId);
+  if (!field) return;
+  if (field.type === 'password') {
+    field.type = 'text';
+    btn.innerText = '🙈';
+  } else {
+    field.type = 'password';
+    btn.innerText = '👁️';
+  }
+}
+
+// Handle Login Form Submit (Email & Password)
+async function handleLoginSubmit(e) {
+  if (e) e.preventDefault();
+  const email = (document.getElementById('login-email')?.value || '').trim();
+  const password = document.getElementById('login-password')?.value || '';
+  const errorAlert = document.getElementById('auth-error-alert');
+  const submitBtn = document.getElementById('login-submit-btn');
+
+  if (!email || !password) {
+    if (errorAlert) {
+      errorAlert.style.display = 'block';
+      errorAlert.innerText = 'Please enter both your email address and password.';
+    }
+    return;
+  }
+
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span>Verifying credentials...</span>';
+  }
+
+  if (errorAlert) errorAlert.style.display = 'none';
+
   try {
-    const res = await fetch('/api/users/current');
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+
     const data = await res.json();
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<span>Sign In to Atelier CRM</span> &rarr;';
+    }
+
+    if (data.success && data.token) {
+      localStorage.setItem('moa_crm_token', data.token);
+      currentAuth.user = data.user;
+      currentAuth.permissions = data.permissions;
+      applyUserPermissions(data.user, data.permissions);
+
+      // Hide login overlay
+      const authScreen = document.getElementById('moa-auth-screen');
+      if (authScreen) authScreen.classList.add('moa-auth-hidden');
+
+      // Initialize workspace
+      await loadUsersList();
+      initConsultations();
+      initAIChats();
+      loadProductionOrders();
+      loadAddons();
+    } else {
+      if (errorAlert) {
+        errorAlert.style.display = 'block';
+        errorAlert.innerText = data.error || 'Invalid email or password.';
+      }
+    }
+  } catch (err) {
+    console.error('Login error', err);
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<span>Sign In to Atelier CRM</span> &rarr;';
+    }
+    if (errorAlert) {
+      errorAlert.style.display = 'block';
+      errorAlert.innerText = 'Connection error. Please check server status.';
+    }
+  }
+}
+
+// Check Current Session Auth from Backend
+async function loadCurrentAuth() {
+  const token = localStorage.getItem('moa_crm_token');
+  const authScreen = document.getElementById('moa-auth-screen');
+
+  if (!token) {
+    if (authScreen) authScreen.classList.remove('moa-auth-hidden');
+    return false;
+  }
+
+  try {
+    const res = await fetch('/api/auth/me', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const data = await res.json();
+
     if (data.success && data.user) {
       currentAuth.user = data.user;
       currentAuth.permissions = data.permissions;
       applyUserPermissions(data.user, data.permissions);
+      if (authScreen) authScreen.classList.add('moa-auth-hidden');
+      return true;
+    } else {
+      localStorage.removeItem('moa_crm_token');
+      if (authScreen) authScreen.classList.remove('moa-auth-hidden');
+      return false;
     }
   } catch (err) {
-    console.error('Failed to load current user auth', err);
+    console.error('Failed to validate session token', err);
+    if (authScreen) authScreen.classList.remove('moa-auth-hidden');
+    return false;
   }
 }
 
-// Switch User / Role
-async function handleSwitchUser(userId) {
+// Handle User Logout
+async function handleLogout() {
+  const token = localStorage.getItem('moa_crm_token');
+  if (token) {
+    try {
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token })
+      });
+    } catch (e) {
+      console.warn('Logout notification failed', e);
+    }
+  }
+
+  localStorage.removeItem('moa_crm_token');
+  const authScreen = document.getElementById('moa-auth-screen');
+  if (authScreen) {
+    authScreen.classList.remove('moa-auth-hidden');
+    const pwdInput = document.getElementById('login-password');
+    if (pwdInput) pwdInput.value = '';
+    const alert = document.getElementById('auth-error-alert');
+    if (alert) alert.style.display = 'none';
+  }
+}
+
+// User List and Management
+async function loadUsersList() {
   try {
-    const res = await fetch('/api/users/switch-user', {
+    const res = await fetch('/api/users');
+    const data = await res.json();
+    if (data.success && data.users) {
+      allStaffUsers = data.users;
+      renderUsersTable(data.users);
+    }
+  } catch (err) {
+    console.error('Failed to load users list', err);
+  }
+}
+
+function renderUsersTable(users) {
+  const tbody = document.getElementById('users-tbody');
+  if (!tbody) return;
+
+  tbody.innerHTML = users.map(u => {
+    let roleClass = 'role-designer';
+    let roleText = 'Senior Designer';
+    if (u.role === 'ADMIN') {
+      roleClass = 'role-admin';
+      roleText = 'Master Admin';
+    } else if (u.role === 'SUB_ADMIN') {
+      roleClass = 'role-subadmin';
+      roleText = 'Sub-Admin';
+    }
+
+    return `
+      <tr>
+        <td><strong>${u.name}</strong></td>
+        <td><code>${u.email}</code></td>
+        <td><span class="role-badge ${roleClass}">${roleText}</span></td>
+        <td><span class="status-badge status-active">${u.status}</span></td>
+        <td><small style="color:#64748b;">${u.lastActive ? new Date(u.lastActive).toLocaleDateString() : 'Never'}</small></td>
+        <td>
+          <button class="moa-action-btn" onclick="handleDeleteUser('${u.id}')" title="Delete User" style="color:#ef4444;">🗑️</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function openNewUserModal() {
+  const modal = document.getElementById('user-modal');
+  if (modal) modal.style.display = 'flex';
+}
+
+function closeUserModal() {
+  const modal = document.getElementById('user-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+async function handleSaveUser(e) {
+  if (e) e.preventDefault();
+  const name = document.getElementById('user-name-input')?.value;
+  const email = document.getElementById('user-email-input')?.value;
+  const password = document.getElementById('user-password-input')?.value;
+  const role = document.getElementById('user-role-input')?.value;
+
+  if (!name || !email || !role || !password) {
+    alert('Please fill in all required fields.');
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/users', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId })
+      body: JSON.stringify({ name, email, password, role })
     });
     const data = await res.json();
     if (data.success) {
-      currentAuth.user = data.user;
-      currentAuth.permissions = data.permissions;
-      applyUserPermissions(data.user, data.permissions);
-      updateCategoryCounts();
-      renderContactsList();
-      renderAIContactsList();
-      loadSessionDetail(activeSessionId);
+      closeUserModal();
+      await loadUsersList();
+      alert(`User ${name} created successfully!`);
+    } else {
+      alert(data.error || 'Failed to create user');
     }
   } catch (err) {
-    console.error('Failed to switch user', err);
+    console.error('Error saving user', err);
+    alert('Failed to connect to server');
+  }
+}
+
+async function handleDeleteUser(userId) {
+  if (!confirm('Are you sure you want to remove this team member?')) return;
+  try {
+    const res = await fetch(`/api/users/${userId}`, { method: 'DELETE' });
+    const data = await res.json();
+    if (data.success) {
+      await loadUsersList();
+    } else {
+      alert(data.error || 'Failed to delete user');
+    }
+  } catch (err) {
+    console.error('Error deleting user', err);
   }
 }
 

@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
+import { authRouter } from './routes/authRoutes';
 import { chatRouter } from './routes/chatRoutes';
 import { productionRouter } from './routes/productionRoutes';
 import { settingsRouter } from './routes/settingsRoutes';
@@ -25,6 +26,7 @@ const extensionsAssetsDir = path.resolve(process.cwd(), 'extensions/moa-designer
 app.use('/extensions-assets', express.static(extensionsAssetsDir));
 
 // Mount API routes
+app.use('/api/auth', authRouter);
 app.use('/api/chat', chatRouter);
 app.use('/api/production', productionRouter);
 app.use('/api/settings', settingsRouter);
