@@ -413,32 +413,34 @@
 }
 
 /* --------------------------------------------------------------------------
-   6. Sizing & Customisation Summary Card
+   6. In-Chat Sizing & Customisation Summary Card
    -------------------------------------------------------------------------- */
-.moa-verification-container {
-  background: #ffffff;
-  border-top: 1px solid var(--moa-border-divider);
-  padding: 12px 14px;
-  flex-shrink: 0;
+.moa-in-chat-card-bubble {
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 4px 0 !important;
+  max-width: 96% !important;
+  width: 100% !important;
 }
 
 .moa-verification-card {
   background: #fdfaf7;
   border: 1.5px solid var(--moa-brand-gold);
-  border-radius: 12px;
-  padding: 12px 14px;
-  box-shadow: 0 4px 14px rgba(158, 109, 56, 0.08);
+  border-radius: 14px;
+  padding: 14px 16px;
+  box-shadow: 0 4px 18px rgba(158, 109, 56, 0.12);
+  width: 100%;
 }
 
 .moa-vc-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .moa-vc-title {
-  font-size: 0.88rem;
+  font-size: 0.92rem;
   font-weight: 700;
   color: var(--moa-brand-black);
   display: flex;
@@ -451,7 +453,7 @@
   color: var(--moa-brand-gold);
   font-size: 0.72rem;
   font-weight: 700;
-  padding: 2px 7px;
+  padding: 2px 8px;
   border-radius: 20px;
   border: 1px solid #e2d2c1;
 }
@@ -460,15 +462,15 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 6px;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .moa-vc-chip {
   background: #ffffff;
   border: 1px solid var(--moa-border-subtle);
   border-radius: 8px;
-  padding: 6px 10px;
-  font-size: 0.82rem;
+  padding: 7px 10px;
+  font-size: 0.84rem;
 }
 
 .moa-vc-chip span {
@@ -480,39 +482,88 @@
   color: var(--moa-brand-black);
 }
 
+.moa-vc-action-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 .moa-vc-confirm-btn {
   width: 100%;
   background: var(--moa-brand-black);
   color: #ffffff;
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 30px;
-  padding: 11px 16px;
-  font-size: 0.9rem;
+  padding: 12px 18px;
+  font-size: 0.92rem;
   font-weight: 700;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 8px;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
 }
 
 .moa-vc-confirm-btn:hover {
   background: #2b2b2b;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
 }
 
-.moa-vc-confirmed-banner {
-  background: #fbf9f5;
-  border: 1.5px solid var(--moa-brand-emerald);
+.moa-vc-confirm-btn:active {
+  transform: translateY(0);
+}
+
+.moa-confirmed-status-pill {
+  background: #f0fdf4;
+  border: 1.5px solid #16a34a;
   border-radius: 10px;
   padding: 10px 14px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  font-size: 0.85rem;
-  color: var(--moa-brand-emerald);
+  justify-content: center;
+  gap: 8px;
+  font-size: 0.88rem;
+  color: #166534;
   font-weight: 700;
+}
+
+.moa-check-circle {
+  background: #16a34a;
+  color: #ffffff;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 900;
+}
+
+.moa-reopen-btn {
+  background: transparent;
+  border: 1px dashed var(--moa-border-subtle);
+  color: var(--moa-text-muted);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+  margin-top: 4px;
+}
+
+.moa-reopen-btn:hover {
+  background: #ffffff;
+  border-color: var(--moa-brand-gold);
+  color: var(--moa-brand-black);
 }
 
 /* --------------------------------------------------------------------------

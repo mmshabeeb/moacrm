@@ -391,10 +391,29 @@
     }
 
     renderVerificationCard(summary) {
-      if (!this.verificationSlot) return;
+      if (!this.messagesContainer) return;
 
-      this.verificationSlot.style.display = 'block';
-      this.verificationSlot.innerHTML = `
+      // Remove any existing in-chat summary cards to avoid duplication
+      const existingCards = this.messagesContainer.querySelectorAll('.moa-in-chat-card-bubble');
+      existingCards.forEach(c => c.remove());
+
+      const cardBubble = document.createElement('div');
+      cardBubble.className = 'moa-wa-bubble moa-wa-incoming moa-in-chat-card-bubble';
+      cardBubble.id = `moa-summary-card-${this.sessionToken}`;
+
+      const baseSize = summary.recommendedSize || summary.recommended_size || '56';
+      const height = summary.height || (summary.height_cm ? `${summary.height_cm} cm` : '165 cm');
+      const bust = summary.bust || (summary.bust_inches ? `${summary.bust_inches}"` : '38"');
+      const fit = (summary.fitPreference || summary.fit_preference || 'Regular').toUpperCase();
+      const length = summary.lengthAdjustment || summary.length || 'Standard Length';
+      const sleeve = summary.sleeveAdjustment || summary.sleeve || 'Standard';
+      const addOns = summary.addOns || summary.customRequests || [];
+      const addOnsHtml = addOns.length > 0 ? `
+        <div class="moa-vc-chip" style="grid-column: span 2;">
+          <span>Add-Ons:</span> <strong>${addOns.join(', ')}</strong>
+        </div>` : '';
+
+      cardBubble.innerHTML = `
         <div class="moa-verification-card">
           <div class="moa-vc-header">
             <span class="moa-vc-title">
@@ -404,20 +423,30 @@
           </div>
 
           <div class="moa-vc-grid">
-            <div class="moa-vc-chip"><span>Base Size:</span> <strong>${summary.recommended_size || '56'}</strong></div>
-            <div class="moa-vc-chip"><span>Height:</span> <strong>${summary.height || '165 cm'}</strong></div>
-            <div class="moa-vc-chip"><span>Bust:</span> <strong>${summary.bust || '38"'}</strong></div>
-            <div class="moa-vc-chip"><span>Fit:</span> <strong>${summary.fit_preference || 'Regular'}</strong></div>
-            <div class="moa-vc-chip" style="grid-column: span 2;"><span>Sleeve:</span> <strong>${summary.sleeve || 'Standard'}</strong></div>
+            <div class="moa-vc-chip"><span>Base Size:</span> <strong>Size ${baseSize}</strong></div>
+            <div class="moa-vc-chip"><span>Height:</span> <strong>${height}</strong></div>
+            <div class="moa-vc-chip"><span>Bust:</span> <strong>${bust}</strong></div>
+            <div class="moa-vc-chip"><span>Fit:</span> <strong>${fit}</strong></div>
+            <div class="moa-vc-chip"><span>Length:</span> <strong>${length}</strong></div>
+            <div class="moa-vc-chip"><span>Sleeve:</span> <strong>${sleeve}</strong></div>
+            ${addOnsHtml}
           </div>
 
-          <button type="button" class="moa-vc-confirm-btn" id="moa-btn-confirm-customisation">
-            <span>✓</span> Confirm My Customisation
-          </button>
+          <div class="moa-vc-action-row" id="moa-action-row-${this.sessionToken}">
+            <button type="button" class="moa-vc-confirm-btn" id="moa-btn-confirm-customisation">
+              <span>✓</span> Confirm My Customisation
+            </button>
+          </div>
+        </div>
+        <div class="moa-wa-meta">
+          <span>${this.formatCurrentTime()}</span>
         </div>
       `;
 
-      const confirmBtn = document.getElementById('moa-btn-confirm-customisation');
+      this.lastSummary = summary;
+      this.messagesContainer.appendChild(cardBubble);
+
+      const confirmBtn = cardBubble.querySelector('#moa-btn-confirm-customisation');
       if (confirmBtn) {
         confirmBtn.addEventListener('click', () => this.handleConfirmCustomisation(summary));
       }
@@ -426,10 +455,23 @@
     }
 
     async handleConfirmCustomisation(summary) {
-      const confirmBtn = document.getElementById('moa-btn-confirm-customisation');
-      if (confirmBtn) {
-        confirmBtn.disabled = true;
-        confirmBtn.innerText = 'Locking Customisation...';
+      const currentSummary = summary || this.lastSummary || {};
+      const actionRow = document.getElementById(`moa-action-row-${this.sessionToken}`);
+      if (actionRow) {
+        actionRow.innerHTML = `
+          <div class="moa-confirmed-status-pill">
+            <span class="moa-check-circle">✓</span>
+            <span>Customisation Confirmed & Added</span>
+          </div>
+          <button type="button" class="moa-reopen-btn" id="moa-reopen-edit-btn">
+            ✏️ Edit / Adjust Measurements
+          </button>
+        `;
+
+        const reopenBtn = actionRow.querySelector('#moa-reopen-edit-btn');
+        if (reopenBtn) {
+          reopenBtn.addEventListener('click', () => this.handleReopenCustomisation());
+        }
       }
 
       try {
@@ -440,38 +482,57 @@
         });
 
         const data = await response.json();
-        if (data.success) {
-          this.isConfirmed = true;
-          this.applyLineItemProperties(data.lineItemProperties || {
-            '_moa_customisation_id': this.sessionToken,
-            'Customisation Fit': (summary.fit_preference || 'REGULAR').toUpperCase(),
-            'Customisation Height': summary.height || '165 cm',
-            'Customisation Bust': summary.bust || '38"',
-            'Customisation Length': summary.length || 'Standard',
-            'Customisation Sleeve': summary.sleeve || 'Standard'
-          });
+        this.isConfirmed = true;
+        this.applyLineItemProperties(data.lineItemProperties || {
+          '_moa_customisation_id': this.sessionToken,
+          'Customisation Fit': (currentSummary.fitPreference || currentSummary.fit_preference || 'REGULAR').toUpperCase(),
+          'Customisation Height': currentSummary.height || (currentSummary.height_cm ? `${currentSummary.height_cm} cm` : '165 cm'),
+          'Customisation Bust': currentSummary.bust || (currentSummary.bust_inches ? `${currentSummary.bust_inches}"` : '38"'),
+          'Customisation Length': currentSummary.lengthAdjustment || currentSummary.length || 'Standard',
+          'Customisation Sleeve': currentSummary.sleeveAdjustment || currentSummary.sleeve || 'Standard'
+        });
 
-          // Show confirmation banner
-          this.verificationSlot.innerHTML = `
-            <div class="moa-vc-confirmed-banner">
-              <span>✓ <strong>Customisation Confirmed & Locked!</strong></span>
-              <small>ID: ${this.sessionToken}</small>
-            </div>
-          `;
+        // Post confirmation message to chat thread
+        this.appendMessage({
+          incoming: true,
+          author: 'MOA Tailoring Team',
+          text: `🎉 Customisation #${this.sessionToken} is confirmed! You can now tap **Add to Bag** to complete your order with bespoke specifications. If you need any adjustments later, just let me know here anytime!`,
+          time: this.formatCurrentTime()
+        });
 
-          // Post confirmation message to chat thread
-          this.appendMessage({
-            incoming: true,
-            author: 'MOA Tailoring Team',
-            text: `🎉 Customisation #${this.sessionToken} has been confirmed! When you click 'Add to Cart', your bespoke measurements will be attached directly to your order for our master cutter.`,
-            time: this.formatCurrentTime()
-          });
-
-          // Unlock and highlight Add to Cart button
-          this.updateCartButtonState(true);
-        }
+        // Unlock and highlight Add to Cart button
+        this.updateCartButtonState(true);
       } catch (err) {
         console.error('Error confirming customisation', err);
+      }
+    }
+
+    handleReopenCustomisation() {
+      this.isConfirmed = false;
+      // Re-lock Add to Cart button until re-confirmed
+      this.updateCartButtonState(true);
+
+      const actionRow = document.getElementById(`moa-action-row-${this.sessionToken}`);
+      if (actionRow) {
+        actionRow.innerHTML = `
+          <button type="button" class="moa-vc-confirm-btn" id="moa-btn-confirm-customisation">
+            <span>✓</span> Confirm My Customisation
+          </button>
+        `;
+        const confirmBtn = actionRow.querySelector('#moa-btn-confirm-customisation');
+        if (confirmBtn) {
+          confirmBtn.addEventListener('click', () => this.handleConfirmCustomisation(this.lastSummary || {}));
+        }
+      }
+
+      this.appendMessage({
+        incoming: true,
+        author: 'MOA AI Designer',
+        text: "Customisation reopened for editing! What would you like to adjust? (e.g. height, sleeve length, fit drape, or add-ons). Once done, tap 'Confirm My Customisation' above.",
+        time: this.formatCurrentTime()
+      });
+      if (this.input) {
+        this.input.focus();
       }
     }
 
