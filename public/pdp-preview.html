@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Royal Silk Velvet Abaya – Emerald | Mall of Abayas (Storefront PDP)</title>
+  
+  <!-- Google Fonts: Playfair Display (Luxury Serif) & Outfit (Modern Sans) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="/extensions-assets/moa_widget.css" />
+
+  <style>
+    :root {
+      --pdp-gold: #8b5a2b;
+      --pdp-gold-light: #f7f3ee;
+      --pdp-dark: #1a1615;
+      --pdp-gray: #666;
+      --pdp-border: #e8e2d9;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: #faf8f5;
+      color: var(--pdp-dark);
+      line-height: 1.6;
+    }
+
+    /* Top Announcement Bar */
+    .store-announcement {
+      background: var(--pdp-dark);
+      color: #f5eee6;
+      text-align: center;
+      padding: 8px 12px;
+      font-size: 0.78rem;
+      letter-spacing: 0.5px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .store-announcement a {
+      color: #d4af37;
+      text-decoration: underline;
+      font-weight: 600;
+    }
+
+    /* Store Header */
+    .store-header {
+      background: #ffffff;
+      border-bottom: 1px solid var(--pdp-border);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .store-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--pdp-dark);
+      text-decoration: none;
+      letter-spacing: 1px;
+    }
+
+    .store-logo span {
+      color: var(--pdp-gold);
+    }
+
+    .store-nav {
+      display: flex;
+      gap: 1.5rem;
+      font-size: 0.88rem;
+      font-weight: 500;
+    }
+
+    .store-nav a {
+      color: #444;
+      text-decoration: none;
+      transition: color 0.15s ease;
+    }
+
+    .store-nav a:hover {
+      color: var(--pdp-gold);
+    }
+
+    .store-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .crm-link-badge {
+      background: #fdf2e9;
+      border: 1px solid #f97316;
+      color: #c2410c;
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .crm-link-badge:hover {
+      background: #fed7aa;
+    }
+
+    /* Product Page Container */
+    .pdp-main {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 3.5rem;
+    }
+
+    /* Product Gallery */
+    .pdp-gallery {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .pdp-main-image {
+      width: 100%;
+      height: 580px;
+      background: linear-gradient(135deg, #1e3a2b 0%, #0d2318 100%);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+    }
+
+    .pdp-main-image::after {
+      content: "👗";
+      font-size: 6rem;
+      opacity: 0.25;
+      position: absolute;
+    }
+
+    .pdp-image-caption {
+      position: absolute;
+      bottom: 20px;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      letter-spacing: 0.5px;
+    }
+
+    /* Product Details */
+    .pdp-details {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .pdp-category {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--pdp-gold);
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+
+    .pdp-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      color: var(--pdp-dark);
+      margin-bottom: 0.65rem;
+      line-height: 1.25;
+    }
+
+    .pdp-price-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .pdp-price {
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: var(--pdp-dark);
+    }
+
+    .pdp-vat-badge {
+      font-size: 0.75rem;
+      color: #777;
+      background: #eee;
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+
+    .pdp-description {
+      font-size: 0.9rem;
+      color: #555;
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+      border-bottom: 1px solid var(--pdp-border);
+      padding-bottom: 1.25rem;
+    }
+
+    /* Standard Size Selector */
+    .pdp-option-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .pdp-option-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .pdp-option-label {
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .pdp-size-guide-btn {
+      background: none;
+      border: none;
+      color: var(--pdp-gold);
+      font-size: 0.8rem;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    .pdp-size-chips {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .pdp-size-btn {
+      background: #ffffff;
+      border: 1.5px solid #d1d7db;
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .pdp-size-btn:hover {
+      border-color: var(--pdp-gold);
+    }
+
+    .pdp-size-btn.active {
+      background: var(--pdp-dark);
+      color: #ffffff;
+      border-color: var(--pdp-dark);
+    }
+
+    /* Add to Cart Actions */
+    .pdp-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .pdp-btn-atc {
+      background: var(--pdp-dark);
+      color: #ffffff;
+      border: none;
+      border-radius: 30px;
+      padding: 14px 20px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.2s ease;
+    }
+
+    .pdp-btn-atc:hover {
+      background: #332b2a;
+      transform: translateY(-1px);
+    }
+
+    .pdp-btn-buy-now {
+      background: var(--pdp-gold);
+      color: #ffffff;
+      border: none;
+      border-radius: 30px;
+      padding: 13px 20px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .pdp-btn-buy-now:hover {
+      background: #734821;
+    }
+
+    /* Cart Toast */
+    .cart-toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #ffffff;
+      border: 1px solid #10b981;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: none;
+      align-items: center;
+      gap: 14px;
+      z-index: 1000;
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    @media (max-width: 900px) {
+      .pdp-main {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+      .pdp-main-image {
+        height: 380px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Announcement Bar -->
+  <div class="store-announcement">
+    <span>🌸 Complimentary bespoke customisations available on all abayas this season</span>
+    <span>•</span>
+    <a href="/" target="_blank">Open Staff CRM Portal &rarr;</a>
+  </div>
+
+  <!-- Store Header -->
+  <header class="store-header">
+    <a href="/pdp-preview.html" class="store-logo">MALL OF <span>ABAYAS</span></a>
+    <nav class="store-nav">
+      <a href="#">New Arrivals</a>
+      <a href="#">Velvet Collection</a>
+      <a href="#">Bisht Sets</a>
+      <a href="#">Occasion Wear</a>
+      <a href="#">Bespoke Tailoring</a>
+    </nav>
+    <div class="store-header-actions">
+      <a href="/" target="_blank" class="crm-link-badge">
+        <span>💬</span> Live Staff CRM
+      </a>
+      <button style="background:none; border:none; font-size:1.2rem; cursor:pointer;" title="Cart">🛒 (0)</button>
+    </div>
+  </header>
+
+  <!-- Product Detail Page Layout -->
+  <main class="pdp-main">
+    
+    <!-- Left Column: Gallery -->
+    <div class="pdp-gallery">
+      <div class="pdp-main-image">
+        <h2 style="font-family:'Playfair Display', serif; font-size: 1.8rem; text-align:center; z-index:1;">Royal Silk Velvet</h2>
+        <span style="font-size:0.9rem; color:#a7f3d0; z-index:1;">Emerald Evening Edition</span>
+        <div class="pdp-image-caption">Bespoke Fit Available</div>
+      </div>
+    </div>
+
+    <!-- Right Column: Product Info & MOA Theme App Extension Block -->
+    <div class="pdp-details">
+      <span class="pdp-category">Occasion & Evening Abayas</span>
+      <h1 class="pdp-title">Royal Silk Velvet Abaya – Emerald</h1>
+      
+      <div class="pdp-price-row">
+        <span class="pdp-price">850.00 AED</span>
+        <span class="pdp-vat-badge">VAT Included</span>
+      </div>
+
+      <p class="pdp-description">
+        Crafted from premium Korean silk velvet with a flowing silhouette, intricate tone-on-tone French seam detailing, and matching chiffon Sheila. Perfect for weddings and formal soirées.
+      </p>
+
+      <!-- Standard Size Selector -->
+      <div class="pdp-option-group">
+        <div class="pdp-option-header">
+          <span class="pdp-option-label">Standard Base Size</span>
+          <button type="button" class="pdp-size-guide-btn" onclick="alert('Standard Abaya Lengths:\n52: 153-157cm\n54: 158-162cm\n56: 163-167cm\n58: 168-172cm')">Size Chart</button>
+        </div>
+        <div class="pdp-size-chips">
+          <button type="button" class="pdp-size-btn" onclick="selectSize(52, this)">52</button>
+          <button type="button" class="pdp-size-btn active" onclick="selectSize(54, this)">54</button>
+          <button type="button" class="pdp-size-btn" onclick="selectSize(56, this)">56</button>
+          <button type="button" class="pdp-size-btn" onclick="selectSize(58, this)">58</button>
+          <button type="button" class="pdp-size-btn" onclick="selectSize(60, this)">60</button>
+        </div>
+      </div>
+
+      <!-- ========================================================================= -->
+      <!-- SHOPIFY PRODUCT FORM WITH EMBEDDED MOA THEME APP EXTENSION BLOCK -->
+      <!-- ========================================================================= -->
+      <form action="/cart/add" method="POST" id="shopify-product-form" onsubmit="handleDemoAddToCart(event)">
+        
+        <!-- Theme App Extension Block: moa_customisation_toggle -->
+        <div class="moa-customisation-container" id="moa-customisation-root" 
+             data-product-id="10495" 
+             data-product-title="Royal Silk Velvet Abaya – Emerald" 
+             data-product-category="occasion_luxury">
+          
+          <!-- 1. The Opt-In Toggle -->
+          <div class="moa-toggle-wrapper" onclick="if(event.target.tagName!=='INPUT'){const cb=document.getElementById('moa-customise-checkbox'); if(cb){cb.checked=!cb.checked; window.MOA_WIDGET && window.MOA_WIDGET.setCustomisationActive(cb.checked);}}">
+            <label class="moa-checkbox-label" for="moa-customise-checkbox">
+              <input type="checkbox" id="moa-customise-checkbox" class="moa-checkbox-input" onchange="window.MOA_WIDGET && window.MOA_WIDGET.setCustomisationActive(this.checked)" />
+              <span class="moa-checkbox-text">
+                <span class="moa-checkbox-title">
+                  <span>Need Customisations?</span>
+                  <span class="moa-badge-free">Complimentary Service</span>
+                </span>
+                <span class="moa-checkbox-subtext">
+                  Chat with bespoke assistant for custom height, sleeves, bust & tailored drape
+                </span>
+              </span>
+            </label>
+          </div>
+
+          <!-- 2. Floating Circular Launcher Bubble (Bottom-Right) -->
+          <div class="moa-floating-launcher" id="moa-floating-launcher" style="display: none;" onclick="window.MOA_WIDGET && window.MOA_WIDGET.togglePanel()" title="Open Customisation Designer">
+            <div class="moa-launcher-avatar">👗</div>
+            <span class="moa-launcher-text">Customise Abaya</span>
+            <span class="moa-launcher-badge" id="moa-launcher-badge">1</span>
+          </div>
+
+          <!-- 3. Floating Modal Customisation Window (Bottom-Right) -->
+          <div class="moa-wa-storefront-panel moa-floating-window" id="moa-designer-panel" style="display: none;">
+            <!-- Atelier Header -->
+            <div class="moa-wa-header">
+              <div class="moa-wa-header-left">
+                <div class="moa-wa-avatar">👗</div>
+                <div>
+                  <span class="moa-wa-title">Mall of Abayas Designer</span>
+                  <span class="moa-wa-status">online • instant bespoke assistance</span>
+                </div>
+              </div>
+              <button type="button" class="moa-wa-minimize-btn" id="moa-minimize-chat" title="Minimize to Bubble">&minus;</button>
+            </div>
+
+            <!-- Chat Messages Thread -->
+            <div class="moa-wa-chat-thread" id="moa-chat-messages">
+              <div class="moa-wa-bubble moa-wa-incoming">
+                <span class="moa-wa-author">MOA Designer</span>
+                <p style="margin:0;">Salam! I'm your MOA Customisation Designer. Tell me your height, preferred fit, or any alteration (e.g. longer sleeves, feeding zip, pockets) in your own words!</p>
+                <div class="moa-wa-meta"><span>Just now</span></div>
+              </div>
+            </div>
+
+            <!-- Quick Recommendation Suggestion Chips -->
+            <div class="moa-quick-chips">
+              <button type="button" class="moa-quick-chip" onclick="window.MOA_WIDGET && window.MOA_WIDGET.sendQuickText('My height is 165 cm, bust 38 inches')">📏 Height 165cm, Bust 38"</button>
+              <button type="button" class="moa-quick-chip" onclick="window.MOA_WIDGET && window.MOA_WIDGET.sendQuickText('I need loose fit with +2 inch longer sleeves')">✨ Loose Fit +2" Sleeve</button>
+              <button type="button" class="moa-quick-chip" onclick="window.MOA_WIDGET && window.MOA_WIDGET.sendQuickText('3-inch heels for wedding')">👠 3-inch Heels</button>
+            </div>
+
+            <!-- Sizing & Customisation Verification Card Slot -->
+            <div id="moa-verification-slot" class="moa-verification-container" style="display: none;"></div>
+
+            <!-- Storefront Bottom Input Bar -->
+            <form id="moa-chat-form" class="moa-wa-input-toolbar">
+              <button type="button" class="moa-wa-icon-btn" title="Emojis" onclick="window.MOA_WIDGET && window.MOA_WIDGET.insertQuickEmoji('✨')">✨</button>
+              <input 
+                type="text" 
+                id="moa-user-input" 
+                class="moa-wa-input-field" 
+                placeholder="Type measurements (e.g. 165 cm, loose fit)..." 
+                autocomplete="off"
+              />
+              <button type="submit" class="moa-wa-send-btn" title="Send message">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+              </button>
+            </form>
+          </div>
+
+          <!-- Hidden Shopify Cart Line Item Properties (Injected on customisation confirmation) -->
+          <input type="hidden" name="properties[_moa_customisation_id]" id="prop-moa-id" value="" disabled />
+          <input type="hidden" name="properties[Customisation Fit]" id="prop-moa-fit" value="" disabled />
+          <input type="hidden" name="properties[Customisation Height]" id="prop-moa-height" value="" disabled />
+          <input type="hidden" name="properties[Customisation Bust]" id="prop-moa-bust" value="" disabled />
+          <input type="hidden" name="properties[Customisation Length]" id="prop-moa-length" value="" disabled />
+          <input type="hidden" name="properties[Customisation Sleeve]" id="prop-moa-sleeve" value="" disabled />
+          <input type="hidden" name="properties[Customisation Notes]" id="prop-moa-notes" value="" disabled />
+        </div>
+
+        <!-- Add to Cart Buttons -->
+        <div class="pdp-actions">
+          <button type="submit" class="pdp-btn-atc" id="demo-add-to-cart-btn">
+            <span>🛍️</span> Add to Bag
+          </button>
+          <button type="button" class="pdp-btn-buy-now" onclick="handleDemoBuyNow()">
+            Instant Checkout
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </main>
+
+  <!-- Cart Added Success Notification Toast -->
+  <div class="cart-toast" id="cart-success-toast">
+    <span style="font-size: 1.8rem;">🛍️</span>
+    <div>
+      <h4 style="font-size: 0.95rem; margin-bottom: 2px;">Added to Cart!</h4>
+      <p style="font-size: 0.8rem; color: #555;" id="cart-toast-details">Royal Silk Velvet Abaya (Size 54)</p>
+    </div>
+  </div>
+
+  <!-- Storefront Scripts -->
+  <script src="/extensions-assets/moa_widget.js"></script>
+
+  <script>
+    function selectSize(size, btn) {
+      document.querySelectorAll('.pdp-size-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    function handleDemoAddToCart(e) {
+      e.preventDefault();
+      const customId = document.getElementById('prop-moa-id')?.value;
+      const fit = document.getElementById('prop-moa-fit')?.value;
+      const height = document.getElementById('prop-moa-height')?.value;
+      const sleeve = document.getElementById('prop-moa-sleeve')?.value;
+
+      const toast = document.getElementById('cart-success-toast');
+      const details = document.getElementById('cart-toast-details');
+
+      if (customId && !document.getElementById('prop-moa-id').disabled) {
+        details.innerHTML = `<strong>Royal Silk Velvet Abaya</strong><br><span style="color:#008069;">✓ Bespoke Customisation #${customId} Attached</span> (${height}, Fit: ${fit}, Sleeve: ${sleeve})`;
+      } else {
+        details.innerText = 'Royal Silk Velvet Abaya (Standard Size 54)';
+      }
+
+      toast.style.display = 'flex';
+      setTimeout(() => {
+        toast.style.display = 'none';
+      }, 4500);
+    }
+
+    function handleDemoBuyNow() {
+      document.getElementById('shopify-product-form').dispatchEvent(new Event('submit'));
+    }
+  </script>
+
+</body>
+</html>

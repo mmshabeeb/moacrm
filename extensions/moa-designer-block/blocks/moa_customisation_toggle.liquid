@@ -1,0 +1,144 @@
+<!-- 
+  Mall of Abayas (MOA) Theme App Extension Block: moa_customisation_toggle.liquid
+  Floating Luxury Customisation Assistant for Online Store 2.0
+-->
+
+{{ 'moa_widget.css' | asset_url | stylesheet_tag }}
+
+{% if product.metafields.moa.customisation_enabled != false %}
+<div class="moa-customisation-container" id="moa-customisation-root" 
+     data-product-id="{{ product.id }}" 
+     data-product-title="{{ product.title | escape }}" 
+     data-product-category="{{ product.metafields.moa.category | default: 'abaya_standard' }}">
+  
+  <!-- 1. The PDP Opt-In Toggle Box -->
+  <div class="moa-toggle-wrapper" onclick="if(event.target.tagName!=='INPUT'){const cb=document.getElementById('moa-customise-checkbox'); if(cb){cb.checked=!cb.checked; window.MOA_WIDGET && window.MOA_WIDGET.setCustomisationActive(cb.checked);}}">
+    <label class="moa-checkbox-label" for="moa-customise-checkbox">
+      <input type="checkbox" id="moa-customise-checkbox" class="moa-checkbox-input" onchange="window.MOA_WIDGET && window.MOA_WIDGET.setCustomisationActive(this.checked)" />
+      <span class="moa-checkbox-text">
+        <span class="moa-checkbox-title">
+          <span>{{ block.settings.toggle_title | default: 'Need Customisations?' }}</span>
+          {% if block.settings.show_free_badge != false %}
+            <span class="moa-badge-free">Complimentary Service</span>
+          {% endif %}
+        </span>
+        <span class="moa-checkbox-subtext">
+          {{ block.settings.toggle_subtitle | default: 'Chat with bespoke assistant for custom height, sleeves, bust & tailored drape' }}
+        </span>
+      </span>
+    </label>
+  </div>
+
+  <!-- 2. Floating Circular Launcher Bubble (Bottom-Right) -->
+  <div class="moa-floating-launcher" id="moa-floating-launcher" style="display: none;" onclick="window.MOA_WIDGET && window.MOA_WIDGET.togglePanel()" title="Open Customisation Designer">
+    <div class="moa-launcher-avatar">👗</div>
+    <span class="moa-launcher-text">Customise Abaya</span>
+    <span class="moa-launcher-badge" id="moa-launcher-badge">1</span>
+  </div>
+
+  <!-- 3. Floating Modal Customisation Window (Bottom-Right) -->
+  <div class="moa-wa-storefront-panel moa-floating-window" id="moa-designer-panel" style="display: none;">
+    <!-- Atelier Header -->
+    <div class="moa-wa-header">
+      <div class="moa-wa-header-left">
+        <div class="moa-wa-avatar">👗</div>
+        <div>
+          <span class="moa-wa-title">{{ block.settings.assistant_title | default: 'Mall of Abayas Designer' }}</span>
+          <span class="moa-wa-status">online • instant bespoke assistance</span>
+        </div>
+      </div>
+      <div class="moa-wa-header-actions">
+        <button type="button" class="moa-wa-minimize-btn" id="moa-minimize-chat" title="Minimize to Bubble">&minus;</button>
+      </div>
+    </div>
+
+    <!-- Chat Messages Thread -->
+    <div class="moa-wa-chat-thread" id="moa-chat-messages">
+      <div class="moa-wa-bubble moa-wa-incoming">
+        <span class="moa-wa-author">{{ block.settings.assistant_title | default: 'MOA Designer' }}</span>
+        <p style="margin:0;">
+          {{ block.settings.default_greeting | default: "Salam! I'm your MOA Customisation Designer. Tell me your height, preferred fit, or any alteration (e.g. longer sleeves, feeding zip, pockets) in your own words!" }}
+        </p>
+        <div class="moa-wa-meta"><span>Just now</span></div>
+      </div>
+    </div>
+
+    <!-- Quick Recommendation Suggestion Chips -->
+    <div class="moa-quick-chips">
+      <button type="button" class="moa-quick-chip" onclick="window.MOA_WIDGET && window.MOA_WIDGET.sendQuickText('My height is 165 cm, bust 38 inches')">📏 Height 165cm, Bust 38"</button>
+      <button type="button" class="moa-quick-chip" onclick="window.MOA_WIDGET && window.MOA_WIDGET.sendQuickText('I need loose fit with +2 inch longer sleeves')">✨ Loose Fit +2" Sleeve</button>
+      <button type="button" class="moa-quick-chip" onclick="window.MOA_WIDGET && window.MOA_WIDGET.sendQuickText('3-inch heels for wedding')">👠 3-inch Heels</button>
+    </div>
+
+    <!-- Sizing & Customisation Verification Card Slot -->
+    <div id="moa-verification-slot" class="moa-verification-container" style="display: none;"></div>
+
+    <!-- Bottom Input Bar -->
+    <form id="moa-chat-form" class="moa-wa-input-toolbar">
+      <button type="button" class="moa-wa-icon-btn" title="Emojis" onclick="window.MOA_WIDGET && window.MOA_WIDGET.insertQuickEmoji('✨')">✨</button>
+      <input 
+        type="text" 
+        id="moa-user-input" 
+        class="moa-wa-input-field" 
+        placeholder="Type measurements (e.g. 165 cm, loose fit)..." 
+        autocomplete="off"
+      />
+      <button type="submit" class="moa-wa-send-btn" title="Send message">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      </button>
+    </form>
+  </div>
+
+  <!-- Hidden Shopify Cart Line Item Properties (Injected automatically on confirmation) -->
+  <input type="hidden" name="properties[_moa_customisation_id]" id="prop-moa-id" value="" disabled />
+  <input type="hidden" name="properties[Customisation Fit]" id="prop-moa-fit" value="" disabled />
+  <input type="hidden" name="properties[Customisation Height]" id="prop-moa-height" value="" disabled />
+  <input type="hidden" name="properties[Customisation Bust]" id="prop-moa-bust" value="" disabled />
+  <input type="hidden" name="properties[Customisation Length]" id="prop-moa-length" value="" disabled />
+  <input type="hidden" name="properties[Customisation Sleeve]" id="prop-moa-sleeve" value="" disabled />
+  <input type="hidden" name="properties[Customisation Notes]" id="prop-moa-notes" value="" disabled />
+</div>
+
+<script src="{{ 'moa_widget.js' | asset_url }}" defer="defer"></script>
+
+{% schema %}
+{
+  "name": "MOA Customisation Widget",
+  "target": "section",
+  "stylesheet": "moa_widget.css",
+  "javascript": "moa_widget.js",
+  "settings": [
+    {
+      "type": "text",
+      "id": "toggle_title",
+      "label": "Toggle Title",
+      "default": "Need Customisations?"
+    },
+    {
+      "type": "text",
+      "id": "toggle_subtitle",
+      "label": "Toggle Subtitle",
+      "default": "Chat with bespoke assistant for custom height, sleeves, bust & tailored drape"
+    },
+    {
+      "type": "text",
+      "id": "assistant_title",
+      "label": "Assistant Display Name",
+      "default": "Mall of Abayas Designer"
+    },
+    {
+      "type": "textarea",
+      "id": "default_greeting",
+      "label": "Default Greeting Message",
+      "default": "Salam! I'm your MOA Customisation Designer. Tell me your height, preferred fit, or any alteration (e.g. longer sleeves, feeding zip, pockets) in your own words!"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_free_badge",
+      "label": "Show 'Complimentary Service' Badge",
+      "default": true
+    }
+  ]
+}
+{% endschema %}
+{% endif %}

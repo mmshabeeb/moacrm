@@ -1,0 +1,98 @@
+// Mall of Abayas (MOA) Customisation & Production Database Schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite" // SQLite for zero-config portable local dev, switchable to postgresql in cloud
+  url      = env("DATABASE_URL")
+}
+
+model CustomisationSession {
+  id                 String   @id @default(uuid())
+  sessionToken       String   @unique
+  productId          String
+  productTitle       String
+  productCategory    String   @default("abaya_standard")
+  customerName       String?
+  customerEmail      String?
+  aiState            String   @default("AI_HANDLING") // AI_HANDLING | HUMAN_REVIEW_REQUIRED | HUMAN_DESIGNER_CONNECTED
+  status             String   @default("GATHERING")   // GATHERING | CLARIFYING | READY_FOR_VERIFICATION | CUSTOMER_CONFIRMED | ESCALATED_TO_SENIOR
+  chatTranscriptJson String   @default("[]")          // Array of {sender, text, timestamp}
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  customisationRecord CustomisationRecord?
+}
+
+model CustomisationRecord {
+  id                   String   @id // e.g. MOA-CUS-000124
+  sessionId            String   @unique
+  session              CustomisationSession @relation(fields: [sessionId], references: [id])
+  
+  // Sizing & Ease
+  baseSize             Int
+  fitPreference        String   @default("regular") // fitted | regular | loose | extra_loose
+  
+  // Measurements
+  heightCm             Float
+  heightFtDisplay      String
+  bustInches           Float
+  waistInches          Float?
+  hipsInches           Float?
+  shoulderInches       Float?
+  sleeveLengthInches   Float?
+  garmentLengthInches  Float
+  
+  // Alterations
+  lengthAdjustmentInches Float  @default(0)
+  sleeveAdjustmentInches Float  @default(0)
+  sleeveStyle          String?
+  hasPockets           Boolean  @default(false)
+  cuffStyle            String?
+  alterationsJson      String   @default("[]") // list of specific alteration tags
+  
+  // Notes
+  customerNotes        String?
+  designerNotes        String?
+  
+  // Status & Verification
+  isConfirmed          Boolean  @default(false)
+  confirmedAt          DateTime?
+  currentVersion       Int      @default(1)
+  
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  revisions            CustomisationRevision[]
+  productionOrder      ProductionOrder?
+}
+
+model CustomisationRevision {
+  id                    String   @id @default(uuid())
+  customisationRecordId String
+  customisationRecord   CustomisationRecord @relation(fields: [customisationRecordId], references: [id])
+  version               Int
+  updatedBy             String   // customer | senior_designer | production_lead
+  changesSummary        String
+  snapshotJson          String
+  createdAt             DateTime @default(now())
+}
+
+model ProductionOrder {
+  id                    String   @id @default(uuid())
+  customisationRecordId String   @unique
+  customisationRecord   CustomisationRecord @relation(fields: [customisationRecordId], references: [id])
+  
+  shopifyOrderId        String?  // e.g. gid://shopify/Order/12345
+  shopifyOrderNumber    String?  // e.g. #10482
+  status                String   @default("ORDER_RECEIVED") // ORDER_RECEIVED | CUSTOMISATION_CONFIRMED | PRODUCTION_PENDING | IN_PRODUCTION | QUALITY_CHECK | READY_FOR_DISPATCH | COMPLETED
+  
+  tailorNotes           String?
+  qualityCheckPassed    Boolean  @default(false)
+  inspectorName         String?
+  
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}

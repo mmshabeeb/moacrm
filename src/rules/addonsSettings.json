@@ -1,0 +1,56 @@
+{
+  "addons": [
+    {
+      "id": "addon_feeding_zip",
+      "name": "Maternity / Feeding Zip",
+      "description": "Discreet hidden vertical zippers on both sides for easy nursing access.",
+      "price": 25,
+      "currency": "AED",
+      "enabled": true,
+      "applicable_categories": ["abaya_standard", "modest_set"]
+    },
+    {
+      "id": "addon_side_pockets",
+      "name": "Side Pockets (Pair)",
+      "description": "Deep seam pockets on both sides for daily convenience.",
+      "price": 15,
+      "currency": "AED",
+      "enabled": true,
+      "applicable_categories": ["abaya_standard", "modest_set", "kaftan_butterfly"]
+    },
+    {
+      "id": "addon_zipper_wrist",
+      "name": "Wudhu / Wrist Zippers",
+      "description": "Concealed 6-inch wrist zippers for easy wudhu ablution.",
+      "price": 20,
+      "currency": "AED",
+      "enabled": true,
+      "applicable_categories": ["abaya_standard", "occasion_luxury"]
+    },
+    {
+      "id": "addon_snap_buttons",
+      "name": "Front Snap Buttons",
+      "description": "High-durability concealed metallic snap buttons along the front opening.",
+      "price": 15,
+      "currency": "AED",
+      "enabled": true,
+      "applicable_categories": ["abaya_standard"]
+    },
+    {
+      "id": "addon_custom_embroidery",
+      "name": "Custom Monogram / Embroidery",
+      "description": "Personalized initial embroidery on cuff or hemline.",
+      "price": 35,
+      "currency": "AED",
+      "enabled": false,
+      "applicable_categories": ["abaya_standard", "occasion_luxury"]
+    }
+  ],
+  "store_settings": {
+    "store_domain": "moa-online.myshopify.com",
+    "currency_symbol": "AED",
+    "brand_name": "Mall of Abayas",
+    "designer_auto_escalation": true,
+    "require_customer_confirmation": true
+  }
+}

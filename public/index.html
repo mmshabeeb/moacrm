@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mall of Abayas (MOA) CRM & Production Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Segoe+UI:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="moa-navbar">
+    <div class="moa-brand">
+      <span class="moa-logo-gold">MALL OF ABAYAS</span>
+      <span class="moa-badge">CRM & PRODUCTION</span>
+    </div>
+    
+    <div class="moa-nav-right">
+      <a href="/pdp-preview.html" target="_blank" class="moa-store-pill" style="text-decoration: none; color: inherit; cursor: pointer;" title="Open Storefront PDP Customisation Demo">
+        <span>🛍️</span>
+        <span>Storefront PDP: <strong>View Live Demo</strong></span>
+      </a>
+
+      <div class="moa-store-pill">
+        <span class="moa-status-dot"></span>
+        <span>Store: <strong>moa-online.myshopify.com</strong></span>
+      </div>
+
+      <!-- User Role Selector & Profile -->
+      <div class="moa-user-profile-widget">
+        <div class="moa-user-avatar" id="user-avatar-icon">F</div>
+        <div class="moa-user-info">
+          <span class="moa-user-name" id="user-display-name">Fatima Al-Nuaimi</span>
+          <span class="moa-user-role-badge moa-role-admin" id="user-display-role">ADMIN</span>
+        </div>
+        <select id="role-switcher-select" class="moa-role-select" onchange="handleSwitchUser(this.value)">
+          <option value="user_admin_1">Fatima (Admin - Full Access)</option>
+          <option value="user_subadmin_1">Noura (Sub-Admin - Chat & Ops)</option>
+          <option value="user_designer_1">Aisha (Senior Designer - Chat Only)</option>
+          <option value="user_designer_2">Mariam (Senior Designer - Chat Only)</option>
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main CRM Shell -->
+  <div class="moa-layout">
+    <!-- Sidebar -->
+    <aside class="moa-sidebar">
+      <nav class="moa-nav-menu">
+        <button class="moa-nav-btn active" data-tab="tab-consultations" id="nav-btn-consultations">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+          <span>Live Consultations</span>
+          <span class="moa-count-badge" id="badge-escalations">2</span>
+        </button>
+
+        <button class="moa-nav-btn" data-tab="tab-ai-chats" id="nav-btn-ai-chats">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          <span>AI Chats</span>
+          <span class="moa-count-badge" id="badge-ai-chats" style="background:#00a884; color:#fff;">1</span>
+        </button>
+        
+        <button class="moa-nav-btn" data-tab="tab-production" id="nav-btn-production">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+          <span>Production Orders</span>
+          <span class="moa-count-badge" id="badge-production">1</span>
+        </button>
+        
+        <button class="moa-nav-btn" data-tab="tab-addons" id="nav-btn-addons">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+          <span>Add-Ons & Settings</span>
+        </button>
+
+        <button class="moa-nav-btn" data-tab="tab-users" id="nav-btn-users">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+          <span>User Management</span>
+        </button>
+        
+        <button class="moa-nav-btn" data-tab="tab-sizes" id="nav-btn-sizes">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+          <span>Size Matrix</span>
+        </button>
+      </nav>
+
+      <!-- Role Status Notice in Sidebar -->
+      <div class="moa-sidebar-role-notice" id="sidebar-role-notice">
+        <small class="notice-title">CURRENT ROLE</small>
+        <div class="notice-role-pill" id="sidebar-role-pill">Admin Access</div>
+        <p class="notice-desc" id="sidebar-role-desc">Full access to live chats, production queue, settings, and team management.</p>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="moa-main-content">
+      
+      <!-- TAB 1: Live Staff Consultations & Senior Designer Inbox -->
+      <section id="tab-consultations" class="moa-tab-pane active">
+        
+        <!-- Top Dossier Bar (Collapsible / Summary) -->
+        <div class="moa-dossier-bar">
+          <div class="moa-dossier-summary-left">
+            <div class="moa-dossier-badge" id="dossier-customisation-id">MOA-CUS-10482</div>
+            <div>
+              <h3 style="font-size: 1.05rem; margin-bottom: 2px;">
+                <span id="dossier-customer-name">Sarah Al-Mansoor</span> 
+                <small style="color: #8b5a2b;" id="dossier-order-badge">(#10482)</small>
+              </h3>
+              <span style="font-size: 0.82rem; color: #666;">
+                Product: <strong id="dossier-product-title">Linen Grace – Mom's Modest Set</strong> • Base Size: <strong id="dossier-base-size">56</strong>
+              </span>
+            </div>
+          </div>
+          <div class="moa-dossier-metrics" onclick="openEditCustomisationModal()" title="Click to edit customisation measurements & specs" style="cursor: pointer;">
+            <div class="metric-chip"><span>Height:</span> <strong id="dossier-metric-height">165 cm</strong></div>
+            <div class="metric-chip"><span>Bust:</span> <strong id="dossier-metric-bust">38"</strong></div>
+            <div class="metric-chip"><span>Fit:</span> <strong style="color:#8b5a2b;" id="dossier-metric-fit">Extra Loose</strong></div>
+            <div class="metric-chip"><span>Sleeve:</span> <strong id="dossier-metric-sleeve">+2" (Loose)</strong></div>
+          </div>
+          <div class="moa-dossier-actions">
+            <button class="moa-btn moa-btn-secondary" id="btn-edit-customisation" onclick="openEditCustomisationModal()" title="Edit customisation specs and measurements">✏️ Edit Specs</button>
+            <button class="moa-btn moa-btn-primary" id="btn-claim-chat" onclick="handleClaimOrTakeover()">🔵 Take Over Chat</button>
+            <button class="moa-btn moa-btn-secondary" id="btn-transfer-chat" onclick="openTransferModal()">🔄 Transfer Chat</button>
+            <button class="moa-btn moa-btn-outline" id="btn-unassign-chat" onclick="handleUnassignChat()" title="Move back to Unassigned box">📥 To Unassigned</button>
+          </div>
+        </div>
+
+        <!-- WhatsApp Web Shell Container -->
+        <div class="wa-shell">
+          <!-- WhatsApp Contact List (Left Panel) -->
+          <div class="wa-contacts-panel">
+            <div class="wa-search-bar">
+              <div class="wa-search-box">
+                <svg width="16" height="16" fill="#8696a0" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 14z"/></svg>
+                <input type="text" id="wa-search-input" placeholder="Search or start new consultation" oninput="filterConsultations(this.value)" />
+              </div>
+            </div>
+
+            <!-- Chat Category Filter Tabs (Unassigned, My Chats, All) -->
+            <div class="wa-category-tabs">
+              <button class="wa-tab-chip active" id="chip-tab-unassigned" onclick="switchChatCategory('UNASSIGNED')" title="Escalated unassigned queue - open and take over to text">
+                <span>⏳ Unassigned</span>
+                <span class="chip-count chip-alert" id="count-unassigned">2</span>
+              </button>
+              <button class="wa-tab-chip" id="chip-tab-my" onclick="switchChatCategory('MY_CHATS')" title="Consultations you have taken over">
+                <span>💬 My Chats</span>
+                <span class="chip-count" id="count-my">0</span>
+              </button>
+              <button class="wa-tab-chip" id="chip-tab-all" onclick="switchChatCategory('ALL_STAFF')" title="Supervisory view of all staff consultations">
+                <span>🌐 All</span>
+                <span class="chip-count" id="count-all">3</span>
+              </button>
+            </div>
+
+            <!-- Contacts List -->
+            <div class="wa-chat-list" id="wa-contacts-list-container">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+          <!-- WhatsApp Chat Window (Right Panel) -->
+          <div class="wa-conversation-panel">
+            <!-- Header -->
+            <div class="wa-chat-header">
+              <div class="wa-header-contact">
+                <div class="wa-avatar-img" id="wa-header-avatar" style="background:#00a884;">S</div>
+                <div class="wa-contact-details">
+                  <span class="wa-contact-name" id="wa-header-name">Sarah Al-Mansoor</span>
+                  <span class="wa-contact-status" id="wa-status-text">online • consultation in progress</span>
+                </div>
+              </div>
+              <div class="wa-header-icons">
+                <button title="Search" class="wa-icon-btn"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg></button>
+                <button title="Menu" class="wa-icon-btn"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 7a2 2 0 1 0-.001-4.001A2 2 0 0 0 12 7zm0 2a2 2 0 1 0 .001 3.999A2 2 0 0 0 12 9zm0 6a2 2 0 1 0 .001 3.999A2 2 0 0 0 12 15z"/></svg></button>
+              </div>
+            </div>
+
+            <!-- WhatsApp Message Wallpaper & Scrollable Thread -->
+            <div class="wa-messages-body" id="wa-messages-container">
+              <!-- Dynamically rendered -->
+            </div>
+
+            <!-- Popover Emoji Tray -->
+            <div class="wa-emoji-tray" id="wa-emoji-tray" style="display: none;">
+              <span class="wa-emoji-item" onclick="insertEmoji('🌸')">🌸</span>
+              <span class="wa-emoji-item" onclick="insertEmoji('👗')">👗</span>
+              <span class="wa-emoji-item" onclick="insertEmoji('✨')">✨</span>
+              <span class="wa-emoji-item" onclick="insertEmoji('🧵')">🧵</span>
+              <span class="wa-emoji-item" onclick="insertEmoji('📏')">📏</span>
+              <span class="wa-emoji-item" onclick="insertEmoji('👍')">👍</span>
+              <span class="wa-emoji-item" onclick="insertEmoji('💖')">💖</span>
+              <span class="wa-emoji-item" onclick="insertEmoji('😊')">😊</span>
+              <span class="wa-emoji-item" onclick="insertEmoji('🙏')">🙏</span>
+              <span class="wa-emoji-item" onclick="insertEmoji('😍')">😍</span>
+              <span class="wa-emoji-item" onclick="insertEmoji('🤍')">🤍</span>
+              <span class="wa-emoji-item" onclick="insertEmoji('🎀')">🎀</span>
+            </div>
+
+            <!-- Popover Attachment Menu -->
+            <div class="wa-attachment-tray" id="wa-attachment-tray" style="display: none;">
+              <div class="wa-attach-btn" onclick="triggerFileUpload('image')">
+                <div class="wa-attach-icon" style="background:#ac44cf;">🖼️</div>
+                <span>Photos & Videos</span>
+              </div>
+              <div class="wa-attach-btn" onclick="triggerFileUpload('doc')">
+                <div class="wa-attach-icon" style="background:#5f66cd;">📄</div>
+                <span>Document / Spec</span>
+              </div>
+              <div class="wa-attach-btn" onclick="triggerFileUpload('camera')">
+                <div class="wa-attach-icon" style="background:#d3396d;">📷</div>
+                <span>Camera</span>
+              </div>
+            </div>
+            <input type="file" id="wa-file-input" style="display: none;" onchange="handleFileAttached(event)" />
+
+            <!-- Locked Takeover Banner (Shown when user has not yet taken over the consultation) -->
+            <div class="wa-locked-takeover-bar" id="wa-locked-takeover-bar" style="display: none;">
+              <div class="wa-locked-msg">
+                <span class="wa-lock-icon" id="wa-lock-icon">⏳</span>
+                <span id="wa-lock-text"><strong>Unassigned Consultation</strong> — Take over this consultation to start texting with the customer.</span>
+              </div>
+              <button class="moa-btn moa-btn-takeover" id="wa-lock-action-btn" onclick="handleClaimOrTakeover()">⚡ Take Over Chat</button>
+            </div>
+
+            <!-- WhatsApp Bottom Input Toolbar (Standard Typing Mode, unlocked when took over) -->
+            <div class="wa-input-toolbar" id="wa-standard-toolbar">
+              <!-- Emoji Button -->
+              <button class="wa-tool-btn" id="wa-emoji-btn" onclick="toggleEmojiTray()" title="Emojis">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="#54656f"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8zm-3.5-9a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm7 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm-3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/></svg>
+              </button>
+
+              <!-- Attachment Paperclip Button -->
+              <button class="wa-tool-btn" id="wa-attach-btn" onclick="toggleAttachmentTray()" title="Attach File / Image">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="#54656f"><path d="M1.816 15.556v.002c0 1.502.584 2.912 1.646 3.972s2.472 1.647 3.974 1.647a5.58 5.58 0 0 0 3.972-1.645l9.547-9.548c.769-.768 1.147-1.767 1.056-2.772-.099-1.103-.642-2.107-1.492-2.756-.998-.763-2.28-.962-3.43-.532-.82.308-1.536.883-2.023 1.624L7.545 13.064c-.381.381-.591.888-.591 1.427 0 .54.21 1.046.591 1.427a2.015 2.015 0 0 0 2.854 0l6.757-6.757a.75.75 0 1 1 1.06 1.06l-6.757 6.757c-.664.664-1.547 1.03-2.484 1.03s-1.82-.366-2.484-1.03a3.52 3.52 0 0 1-1.03-2.487c0-.937.366-1.82 1.03-2.484l7.525-7.525a4.42 4.42 0 0 1 1.583-1.092c.792-.296 1.67-.16 2.355.364.58.444.952 1.13 1.02 1.884.062.686-.195 1.363-.717 1.885l-9.547 9.548a4.08 4.08 0 0 1-2.912 1.206 4.08 4.08 0 0 1-2.912-1.206 4.08 4.08 0 0 1-1.206-2.912c0-1.097.427-2.128 1.206-2.907l8.283-8.283a.75.75 0 1 1 1.06 1.06l-8.283 8.283c-.499.499-.773 1.162-.773 1.867z"/></svg>
+              </button>
+
+              <!-- Text Input Field -->
+              <div class="wa-input-box-wrapper">
+                <input 
+                  type="text" 
+                  id="designer-reply-input" 
+                  class="wa-input-box" 
+                  placeholder="Type a message..." 
+                  autocomplete="off"
+                  onkeydown="handleInputKeydown(event)"
+                />
+              </div>
+
+              <!-- Voice Recording (Mic) Button -->
+              <button class="wa-tool-btn wa-mic-btn" id="wa-mic-btn" onclick="startVoiceRecording()" title="Record Voice Note">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="#54656f"><path d="M11.999 14.942c2.001 0 3.531-1.53 3.531-3.531V4.35c0-2.001-1.53-3.531-3.531-3.531S8.469 2.35 8.469 4.35v7.061c0 2.001 1.53 3.531 3.53 3.531zm-5.07-5.07a.75.75 0 0 0-1.5 0c0 3.25 2.378 5.962 5.57 6.447v2.431H8.75a.75.75 0 0 0 0 1.5h6.5a.75.75 0 0 0 0-1.5h-2.25v-2.431c3.192-.485 5.57-3.197 5.57-6.447a.75.75 0 0 0-1.5 0c0 2.8-2.27 5.07-5.07 5.07s-5.07-2.27-5.07-5.07z"/></svg>
+              </button>
+
+              <!-- Send Button -->
+              <button class="wa-send-btn" id="wa-send-btn" onclick="sendDesignerReply()" title="Send">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M1.101 21.757 23.8 12.028 1.101 2.3l.011 7.912 13.623 1.816-13.623 1.817-.011 7.912z"/></svg>
+              </button>
+            </div>
+
+            <!-- WhatsApp Live Voice Recording Control Bar (Hidden by default, shown when recording) -->
+            <div class="wa-recording-toolbar" id="wa-recording-toolbar" style="display: none;">
+              <!-- Discard / Trash Button -->
+              <button class="wa-record-action-btn wa-trash-btn" onclick="discardVoiceRecording()" title="Discard Recording">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="#ea4335"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+              </button>
+
+              <!-- Live Timer & Red Pulsing Dot -->
+              <div class="wa-recording-indicator">
+                <span class="wa-red-dot" id="wa-recording-dot"></span>
+                <span class="wa-recording-timer" id="wa-recording-timer">0:00</span>
+              </div>
+
+              <!-- Animated Waveform Visualizer -->
+              <div class="wa-recording-waveform" id="wa-live-waveform">
+                <div class="wa-live-bar"></div>
+                <div class="wa-live-bar"></div>
+                <div class="wa-live-bar"></div>
+                <div class="wa-live-bar"></div>
+                <div class="wa-live-bar"></div>
+                <div class="wa-live-bar"></div>
+                <div class="wa-live-bar"></div>
+                <div class="wa-live-bar"></div>
+                <div class="wa-live-bar"></div>
+                <div class="wa-live-bar"></div>
+                <div class="wa-live-bar"></div>
+                <div class="wa-live-bar"></div>
+                <div class="wa-live-bar"></div>
+                <div class="wa-live-bar"></div>
+              </div>
+
+              <!-- Pause / Resume Button -->
+              <button class="wa-record-action-btn wa-pause-resume-btn" id="wa-pause-resume-btn" onclick="togglePauseResumeRecording()" title="Pause/Resume">
+                <svg id="icon-pause" viewBox="0 0 24 24" width="20" height="20" fill="#ea4335"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                <svg id="icon-resume" viewBox="0 0 24 24" width="20" height="20" fill="#00a884" style="display:none;"><path d="M8 5v14l11-7z"/></svg>
+              </button>
+
+              <!-- Send Recorded Voice Note -->
+              <button class="wa-send-btn" onclick="finishAndSendVoiceRecording()" title="Send Voice Note">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M1.101 21.757 23.8 12.028 1.101 2.3l.011 7.912 13.623 1.816-13.623 1.817-.011 7.912z"/></svg>
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+      </section>
+
+      <!-- TAB: AI Live Chats (Automated PDP Consultations) -->
+      <section id="tab-ai-chats" class="moa-tab-pane">
+        <!-- Top Dossier Bar for AI Live Monitoring -->
+        <div class="moa-dossier-bar">
+          <div class="moa-dossier-summary-left">
+            <div class="moa-dossier-badge" style="background:#e0f2fe; color:#0369a1;" id="ai-dossier-id">MOA-CUS-10250</div>
+            <div>
+              <h3 style="font-size: 1.05rem; margin-bottom: 2px;">
+                <span id="ai-dossier-customer">Huda (Riyadh)</span> 
+                <small style="color: #0284c7;" id="ai-dossier-order">(#10250)</small>
+                <span style="font-size:0.75rem; background:#dcfce7; color:#15803d; padding:2px 7px; border-radius:12px; margin-left:6px; font-weight:600;">🤖 AI Active</span>
+              </h3>
+              <span style="font-size: 0.82rem; color: #666;">
+                Product: <strong id="ai-dossier-product">Classic Nidha Butterfly Abaya</strong> • Base Size: <strong id="ai-dossier-size">54</strong>
+              </span>
+            </div>
+          </div>
+          <div class="moa-dossier-metrics">
+            <div class="metric-chip"><span>Height:</span> <strong id="ai-metric-height">158 cm</strong></div>
+            <div class="metric-chip"><span>Bust:</span> <strong id="ai-metric-bust">34"</strong></div>
+            <div class="metric-chip"><span>Fit:</span> <strong style="color:#0369a1;" id="ai-metric-fit">Regular Flared</strong></div>
+            <div class="metric-chip"><span>Sleeve:</span> <strong id="ai-metric-sleeve">Standard (27")</strong></div>
+          </div>
+          <div class="moa-dossier-actions">
+            <button class="moa-btn moa-btn-takeover" onclick="handleTakeoverAIChat()">⚡ Intervene & Take Over Chat</button>
+          </div>
+        </div>
+
+        <!-- WhatsApp Shell for AI Live Chats -->
+        <div class="wa-shell">
+          <!-- Left Panel: AI Live Active Sessions -->
+          <div class="wa-contacts-panel">
+            <div class="wa-contacts-header">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span style="font-size:1.2rem;">🤖</span>
+                <span style="font-size:0.9rem; font-weight:700; color:#111b21;">Storefront AI Sessions</span>
+              </div>
+              <span class="chip-count" style="background:#00a884; color:#fff;" id="ai-panel-count">1</span>
+            </div>
+
+            <div class="wa-search-bar">
+              <div class="wa-search-box">
+                <svg width="16" height="16" fill="#8696a0" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 14z"/></svg>
+                <input type="text" placeholder="Search active AI shoppers..." oninput="filterAIConsultations(this.value)" />
+              </div>
+            </div>
+
+            <div class="wa-chat-list" id="ai-contacts-list-container">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+          <!-- Right Panel: AI Live Conversation Thread -->
+          <div class="wa-conversation-panel">
+            <div class="wa-chat-header">
+              <div class="wa-header-contact">
+                <div class="wa-avatar-img" id="ai-header-avatar" style="background:#d97706;">H</div>
+                <div class="wa-contact-details">
+                  <span class="wa-contact-name" id="ai-header-name">Huda (Riyadh)</span>
+                  <span class="wa-contact-status" id="ai-header-status" style="color:#00a884;">online • chatting with AI Designer on PDP</span>
+                </div>
+              </div>
+              <div class="wa-header-icons">
+                <span style="font-size:0.75rem; background:#f0fdf4; border:1px solid #bbf7d0; color:#166534; font-weight:700; padding:4px 8px; border-radius:6px;">LIVE STOREFRONT SESSION</span>
+              </div>
+            </div>
+
+            <div class="wa-messages-body" id="ai-messages-container">
+              <!-- Rendered dynamically -->
+            </div>
+
+            <!-- Intervene Banner at bottom of AI Chat -->
+            <div class="wa-locked-takeover-bar" style="background:#f0fdf4; border-top-color:#bbf7d0;">
+              <div class="wa-locked-msg">
+                <span class="wa-lock-icon">🤖</span>
+                <span><strong>AI Designer Bot Active</strong> — Customer is chatting on Shopify PDP. You can intervene at any time.</span>
+              </div>
+              <button class="moa-btn moa-btn-takeover" onclick="handleTakeoverAIChat()">⚡ Intervene & Take Over Chat</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: Production Orders & Tailor Work Orders (Admin Only) -->
+      <section id="tab-production" class="moa-tab-pane">
+        <div class="moa-pane-header">
+          <div>
+            <h2>Master Tailor Production Orders</h2>
+            <p class="moa-subtext">Track order manufacturing status, inspect custom specifications, and print production cutting sheets.</p>
+          </div>
+        </div>
+
+        <div class="moa-table-card">
+          <table class="moa-data-table" id="production-table">
+            <thead>
+              <tr>
+                <th>Customisation ID</th>
+                <th>Shopify Order</th>
+                <th>Customer</th>
+                <th>Product & Base</th>
+                <th>Custom Specs</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="production-tbody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- TAB 3: Add-Ons & Tailoring Settings (Admin Only) -->
+      <section id="tab-addons" class="moa-tab-pane">
+        <div class="moa-pane-header">
+          <div>
+            <h2>Add-Ons & Tailoring Settings</h2>
+            <p class="moa-subtext">Configure optional custom add-ons (Feeding Zip, Pockets, Wudhu Zips) and prices shown to customers.</p>
+          </div>
+          <button class="moa-btn moa-btn-gold" onclick="openNewAddonModal()">+ Add New Add-On</button>
+        </div>
+
+        <div class="moa-addons-grid" id="addons-container">
+          <!-- Rendered dynamically -->
+        </div>
+      </section>
+
+      <!-- TAB 4: User Management (Admin Only) -->
+      <section id="tab-users" class="moa-tab-pane">
+        <div class="moa-pane-header">
+          <div>
+            <h2>User Management & Role Permissions</h2>
+            <p class="moa-subtext">Manage team members and configure roles (Admin vs Senior Designer - Chat Only).</p>
+          </div>
+          <button class="moa-btn moa-btn-gold" onclick="openNewUserModal()">+ Add New Team Member</button>
+        </div>
+
+        <div class="moa-table-card">
+          <table class="moa-data-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Assigned Role</th>
+                <th>Status</th>
+                <th>Last Active</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="users-tbody">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- TAB 5: Size Matrix -->
+      <section id="tab-sizes" class="moa-tab-pane">
+        <div class="moa-pane-header">
+          <div>
+            <h2>MOA Standard Sizing Rules Matrix</h2>
+            <p class="moa-subtext">Baseline size reference matrix used by the AI Designer for recommendations.</p>
+          </div>
+        </div>
+
+        <div class="moa-table-card">
+          <table class="moa-data-table">
+            <thead>
+              <tr>
+                <th>Size</th>
+                <th>Height (ft)</th>
+                <th>Height (cm)</th>
+                <th>Abaya Length</th>
+                <th>Bust (Flat, One Side)</th>
+                <th>Bust (Circumference)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>52</strong></td><td>5.0 ft</td><td>153 cm</td><td>52"</td><td>21"</td><td>42"</td></tr>
+              <tr><td><strong>53</strong></td><td>5.1 ft</td><td>155 cm</td><td>53"</td><td>21"</td><td>42"</td></tr>
+              <tr><td><strong>54</strong></td><td>5.2 ft</td><td>158 cm</td><td>54"</td><td>22"</td><td>44"</td></tr>
+              <tr><td><strong>55</strong></td><td>5.3 ft</td><td>161 cm</td><td>55"</td><td>22"</td><td>44"</td></tr>
+              <tr><td><strong>56</strong></td><td>5.4 ft</td><td>164 cm</td><td>56"</td><td>23"</td><td>46"</td></tr>
+              <tr><td><strong>57</strong></td><td>5.5 ft</td><td>167 cm</td><td>57"</td><td>23"</td><td>46"</td></tr>
+              <tr><td><strong>58</strong></td><td>5.6 ft</td><td>170 cm</td><td>58"</td><td>24"</td><td>48"</td></tr>
+              <tr><td><strong>59</strong></td><td>5.7 ft</td><td>173 cm</td><td>59"</td><td>24"</td><td>48"</td></tr>
+              <tr><td><strong>60</strong></td><td>5.8 ft</td><td>176 cm</td><td>60"</td><td>25"</td><td>50"</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Modal for Adding / Editing Add-on -->
+  <div id="addon-modal" class="moa-modal-overlay" style="display: none;">
+    <div class="moa-modal-content">
+      <div class="moa-modal-header">
+        <h3 id="modal-title">New Tailoring Add-On</h3>
+        <button class="moa-close-modal" onclick="closeAddonModal()">&times;</button>
+      </div>
+      <form id="addon-form" onsubmit="handleSaveAddon(event)">
+        <div class="moa-form-group">
+          <label>Add-On Name</label>
+          <input type="text" id="addon-name-input" placeholder="e.g. Maternity / Feeding Zip" required />
+        </div>
+        <div class="moa-form-group">
+          <label>Description</label>
+          <textarea id="addon-desc-input" placeholder="e.g. Hidden vertical zippers for nursing ease"></textarea>
+        </div>
+        <div class="moa-form-row">
+          <div class="moa-form-group">
+            <label>Price (AED)</label>
+            <input type="number" id="addon-price-input" min="0" value="20" required />
+          </div>
+          <div class="moa-form-group">
+            <label>Enabled</label>
+            <select id="addon-enabled-input">
+              <option value="true">Enabled</option>
+              <option value="false">Disabled</option>
+            </select>
+          </div>
+        </div>
+        <div class="moa-modal-footer">
+          <button type="button" class="moa-btn moa-btn-outline" onclick="closeAddonModal()">Cancel</button>
+          <button type="submit" class="moa-btn moa-btn-gold">Save Add-On</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal for Adding New User -->
+  <div id="user-modal" class="moa-modal-overlay" style="display: none;">
+    <div class="moa-modal-content">
+      <div class="moa-modal-header">
+        <h3>Add New Team Member</h3>
+        <button class="moa-close-modal" onclick="closeUserModal()">&times;</button>
+      </div>
+      <form id="user-form" onsubmit="handleSaveUser(event)">
+        <div class="moa-form-group">
+          <label>Full Name</label>
+          <input type="text" id="user-name-input" placeholder="e.g. Reem Designer" required />
+        </div>
+        <div class="moa-form-group">
+          <label>Email Address</label>
+          <input type="email" id="user-email-input" placeholder="reem.designer@mallofabayas.com" required />
+        </div>
+        <div class="moa-form-group">
+          <label>Role</label>
+          <select id="user-role-input">
+            <option value="SENIOR_DESIGNER">Senior Designer (Chat Only)</option>
+            <option value="SUB_ADMIN">Sub-Admin (Chat & Production Operations)</option>
+            <option value="ADMIN">Admin (Full System Access)</option>
+          </select>
+          <small style="display:block; color:#777; margin-top:4px;">Senior Designers can only access and reply to Live Consultations.</small>
+        </div>
+        <div class="moa-modal-footer">
+          <button type="button" class="moa-btn moa-btn-outline" onclick="closeUserModal()">Cancel</button>
+          <button type="submit" class="moa-btn moa-btn-gold">Create User</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Transfer Consultation -->
+  <div id="transfer-chat-modal" class="moa-modal-overlay" style="display: none;">
+    <div class="moa-modal-content" style="max-width: 480px;">
+      <div class="moa-modal-header">
+        <h3 style="display: flex; align-items: center; gap: 8px;">
+          <span>🔄</span> Transfer Consultation
+        </h3>
+        <button class="moa-close-modal" onclick="closeTransferModal()">&times;</button>
+      </div>
+      <div style="padding: 1rem 1.5rem;">
+        <p style="font-size: 0.88rem; color: #555; margin-bottom: 1.25rem;">
+          Transfer customer <strong id="transfer-modal-cust-name">Sarah Al-Mansoor</strong> (<span id="transfer-modal-id">MOA-CUS-10482</span>) to another designer, an administrator, or return to the Unassigned queue.
+        </p>
+
+        <div class="moa-form-group">
+          <label style="display:block; font-size: 0.8rem; font-weight: 700; margin-bottom: 6px; color: #333;">TRANSFER DESTINATION</label>
+          <select id="transfer-recipient-select" style="width: 100%; padding: 10px; border: 1px solid #d1d7db; border-radius: 8px; font-size: 0.9rem;">
+            <!-- Rendered dynamically -->
+          </select>
+        </div>
+
+        <div class="moa-form-group" style="margin-top: 1rem;">
+          <label style="display:block; font-size: 0.8rem; font-weight: 700; margin-bottom: 6px; color: #333;">HANDOVER REASON / NOTES (OPTIONAL)</label>
+          <input type="text" id="transfer-note-input" placeholder="e.g. Needs sleeve +2 inch fitting check, approved cuff style" style="width: 100%; padding: 9px 12px; border: 1px solid #d1d7db; border-radius: 8px; font-size: 0.85rem;" />
+        </div>
+      </div>
+      <div class="moa-modal-footer">
+        <button type="button" class="moa-btn moa-btn-outline" onclick="closeTransferModal()">Cancel</button>
+        <button type="button" class="moa-btn moa-btn-gold" onclick="submitTransferChat()">Confirm Transfer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Edit Customer Customisation -->
+  <div id="edit-customisation-modal" class="moa-modal-overlay" style="display: none;">
+    <div class="moa-modal-content" style="max-width: 560px; max-height: 90vh; overflow-y: auto;">
+      <div class="moa-modal-header" style="position: sticky; top: 0; background: #ffffff; z-index: 10;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.3rem;">✏️</span>
+          <div>
+            <h3 style="margin: 0; font-size: 1.05rem;">Edit Customer Customisation</h3>
+            <span style="font-size: 0.78rem; color: #666;" id="edit-modal-subtitle">Sarah Al-Mansoor • MOA-CUS-10482</span>
+          </div>
+        </div>
+        <button class="moa-close-modal" onclick="closeEditCustomisationModal()">&times;</button>
+      </div>
+
+      <form id="edit-customisation-form" onsubmit="handleSaveCustomisation(event)" style="padding: 1.25rem 1.5rem;">
+        
+        <!-- Product & Order Info Summary -->
+        <div style="background: #faf8f5; border: 1px solid #e7ded5; border-radius: 8px; padding: 10px 14px; margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <span style="font-size: 0.75rem; color: #888; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Product Item</span>
+            <div style="font-weight: 600; font-size: 0.88rem; color: #222;" id="edit-modal-product-title">Linen Grace – Mom's Modest Set</div>
+          </div>
+          <div class="moa-dossier-badge" id="edit-modal-badge" style="font-size: 0.78rem;">MOA-CUS-10482</div>
+        </div>
+
+        <!-- 2-Column Grid for Core Sizing & Tailoring Specs -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1rem;">
+          <div class="moa-form-group">
+            <label style="display: block; font-size: 0.78rem; font-weight: 700; color: #333; margin-bottom: 5px;">BASE SIZE</label>
+            <select id="edit-cust-base-size" style="width: 100%; padding: 8px 10px; border: 1px solid #d1d7db; border-radius: 6px; font-size: 0.88rem; font-weight: 600; background: #ffffff;">
+              <option value="50">Size 50 (148-152 cm • 50" len)</option>
+              <option value="52">Size 52 (153-157 cm • 52" len)</option>
+              <option value="54">Size 54 (158-162 cm • 54" len)</option>
+              <option value="56">Size 56 (163-167 cm • 56" len)</option>
+              <option value="58">Size 58 (168-172 cm • 58" len)</option>
+              <option value="60">Size 60 (173-177 cm • 60" len)</option>
+              <option value="62">Size 62 (178-185 cm • 62" len)</option>
+            </select>
+          </div>
+
+          <div class="moa-form-group">
+            <label style="display: block; font-size: 0.78rem; font-weight: 700; color: #333; margin-bottom: 5px;">FIT PREFERENCE</label>
+            <select id="edit-cust-fit" style="width: 100%; padding: 8px 10px; border: 1px solid #d1d7db; border-radius: 6px; font-size: 0.88rem; background: #ffffff;">
+              <option value="Regular Flared">Regular Flared (Classic)</option>
+              <option value="Extra Loose">Extra Loose (Modest Drape)</option>
+              <option value="Tailored Modest">Tailored Modest (Semi-Fitted)</option>
+              <option value="Slim Cut">Slim Cut</option>
+              <option value="Standard A-Line">Standard A-Line</option>
+              <option value="Maternity Flared">Maternity Flared (+6" ease)</option>
+            </select>
+          </div>
+
+          <div class="moa-form-group">
+            <label style="display: block; font-size: 0.78rem; font-weight: 700; color: #333; margin-bottom: 5px;">HEIGHT (CM / FEET)</label>
+            <input type="text" id="edit-cust-height" placeholder="e.g. 165 cm or 5'5&quot;" style="width: 100%; padding: 8px 10px; border: 1px solid #d1d7db; border-radius: 6px; font-size: 0.88rem;" required />
+          </div>
+
+          <div class="moa-form-group">
+            <label style="display: block; font-size: 0.78rem; font-weight: 700; color: #333; margin-bottom: 5px;">BUST CIRCUMFERENCE</label>
+            <input type="text" id="edit-cust-bust" placeholder="e.g. 38&quot; or 96 cm" style="width: 100%; padding: 8px 10px; border: 1px solid #d1d7db; border-radius: 6px; font-size: 0.88rem;" required />
+          </div>
+
+          <div class="moa-form-group">
+            <label style="display: block; font-size: 0.78rem; font-weight: 700; color: #333; margin-bottom: 5px;">SLEEVE ADJUSTMENT</label>
+            <input type="text" id="edit-cust-sleeve" placeholder="e.g. +2&quot; (Loose) or Standard" style="width: 100%; padding: 8px 10px; border: 1px solid #d1d7db; border-radius: 6px; font-size: 0.88rem;" />
+          </div>
+
+          <div class="moa-form-group">
+            <label style="display: block; font-size: 0.78rem; font-weight: 700; color: #333; margin-bottom: 5px;">LENGTH ADJUSTMENT</label>
+            <input type="text" id="edit-cust-length" placeholder="e.g. +1.5&quot; (Heels) or 55.5&quot;" style="width: 100%; padding: 8px 10px; border: 1px solid #d1d7db; border-radius: 6px; font-size: 0.88rem;" />
+          </div>
+        </div>
+
+        <!-- Add-on Accessories & Options -->
+        <div style="margin-bottom: 1rem; border-top: 1px dashed #e2e8f0; padding-top: 0.85rem;">
+          <label style="display: block; font-size: 0.78rem; font-weight: 700; color: #333; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Customisation Add-ons</label>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <label style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; color: #333; cursor: pointer; background: #f8fafc; padding: 6px 10px; border: 1px solid #e2e8f0; border-radius: 6px;">
+              <input type="checkbox" id="addon-side-pockets" value="Side Pockets (+15 AED)" />
+              <span>Side Pockets <strong style="color: #8b5a2b;">(+15 AED)</strong></span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; color: #333; cursor: pointer; background: #f8fafc; padding: 6px 10px; border: 1px solid #e2e8f0; border-radius: 6px;">
+              <input type="checkbox" id="addon-maternity-zip" value="Maternity Zipper (+25 AED)" />
+              <span>Feeding Zipper <strong style="color: #8b5a2b;">(+25 AED)</strong></span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; color: #333; cursor: pointer; background: #f8fafc; padding: 6px 10px; border: 1px solid #e2e8f0; border-radius: 6px;">
+              <input type="checkbox" id="addon-matching-hijab" value="Matching Hijab (+35 AED)" />
+              <span>Matching Hijab <strong style="color: #8b5a2b;">(+35 AED)</strong></span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; color: #333; cursor: pointer; background: #f8fafc; padding: 6px 10px; border: 1px solid #e2e8f0; border-radius: 6px;">
+              <input type="checkbox" id="addon-organza-cuff" value="Organza Lined Cuffs (+30 AED)" />
+              <span>Organza Cuffs <strong style="color: #8b5a2b;">(+30 AED)</strong></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Special Tailoring / Workshop Instructions -->
+        <div class="moa-form-group">
+          <label style="display: block; font-size: 0.78rem; font-weight: 700; color: #333; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px;">TAILORING & MASTER CUTTER NOTES</label>
+          <textarea id="edit-cust-notes" rows="2" placeholder="e.g. Customer wearing 3-inch heels for wedding. Leave 2-inch extra hem allowance inside." style="width: 100%; padding: 8px 10px; border: 1px solid #d1d7db; border-radius: 6px; font-size: 0.85rem; font-family: inherit; resize: vertical;"></textarea>
+        </div>
+
+        <div class="moa-modal-footer" style="position: sticky; bottom: 0; background: #ffffff; padding: 1rem 0 0 0; border-top: 1px solid #e2e8f0; margin-top: 1rem;">
+          <button type="button" class="moa-btn moa-btn-outline" onclick="closeEditCustomisationModal()">Cancel</button>
+          <button type="submit" class="moa-btn moa-btn-gold">💾 Save Customisation</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

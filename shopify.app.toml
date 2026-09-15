@@ -1,0 +1,30 @@
+# Mall of Abayas (MOA) Shopify App Configuration
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+name = "Mall of Abayas (MOA) AI Designer & Production CRM"
+client_id = "moa-shopify-customisation-crm"
+application_url = "https://crm.mallofabayas.com"
+embedded = true
+
+[access_scopes]
+scopes = "read_products,write_products,read_orders,write_orders,read_metaobjects,write_metaobjects"
+
+[auth]
+redirect_urls = [
+  "https://crm.mallofabayas.com/auth/callback",
+  "https://crm.mallofabayas.com/auth/shopify/callback"
+]
+
+[webhooks]
+api_version = "2024-07"
+
+[[webhooks.subscriptions]]
+topics = [ "orders/create", "orders/paid" ]
+uri = "https://crm.mallofabayas.com/webhooks/shopify/orders/create"
+
+[pos]
+embedded = false
+
+[build]
+automatically_update_urls_on_dev = true
+dev_store_url = "mall-of-abayas-dev.myshopify.com"

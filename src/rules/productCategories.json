@@ -1,0 +1,144 @@
+{
+  "categories": [
+    {
+      "id": "abaya_standard",
+      "display_name": "Standard Abayas (Closed / Front Open / Kimono)",
+      "required_measurements": [
+        "height",
+        "bust",
+        "fit_preference"
+      ],
+      "optional_measurements": [
+        "waist",
+        "sleeve_length",
+        "shoulder"
+      ],
+      "allowed_alterations": [
+        {
+          "type": "length_adjustment",
+          "unit": "inches",
+          "min": -6,
+          "max": 6,
+          "extra_charge_threshold": 4,
+          "extra_charge": 15
+        },
+        {
+          "type": "sleeve_adjustment",
+          "unit": "inches",
+          "min": -4,
+          "max": 4,
+          "extra_charge_threshold": 3,
+          "extra_charge": 10
+        },
+        {
+          "type": "add_pockets",
+          "options": ["None", "One Side Pocket", "Both Side Pockets", "Zipper Pockets"],
+          "extra_charge": 10
+        },
+        {
+          "type": "cuff_style",
+          "options": ["Standard Open", "Elasticated Smocked", "Snap Button", "Zippered Wrist", "French Cuff"]
+        },
+        {
+          "type": "front_closure",
+          "options": ["Hidden Snaps", "Full Zipper", "Belt Only", "Sewn Closed"]
+        }
+      ]
+    },
+    {
+      "id": "modest_set",
+      "display_name": "Mom's Modest Sets & 2-Piece / 3-Piece Co-ords",
+      "required_measurements": [
+        "height",
+        "bust",
+        "waist",
+        "fit_preference"
+      ],
+      "optional_measurements": [
+        "hips",
+        "pant_length",
+        "sleeve_length"
+      ],
+      "allowed_alterations": [
+        {
+          "type": "top_length_adjustment",
+          "unit": "inches",
+          "min": -4,
+          "max": 4
+        },
+        {
+          "type": "pant_length_adjustment",
+          "unit": "inches",
+          "min": -6,
+          "max": 6
+        },
+        {
+          "type": "sleeve_adjustment",
+          "unit": "inches",
+          "min": -3,
+          "max": 3
+        },
+        {
+          "type": "pant_waist_type",
+          "options": ["Full Elastic", "Flat Front with Back Elastic", "Drawstring"]
+        }
+      ]
+    },
+    {
+      "id": "occasion_luxury",
+      "display_name": "Occasion & Hand-Embroidered / Beaded Abayas",
+      "required_measurements": [
+        "height",
+        "bust",
+        "waist",
+        "shoulder",
+        "sleeve_length",
+        "fit_preference"
+      ],
+      "optional_measurements": [
+        "hips",
+        "wrist_circumference"
+      ],
+      "allowed_alterations": [
+        {
+          "type": "length_adjustment",
+          "unit": "inches",
+          "min": -3,
+          "max": 3,
+          "note": "Limited alteration range to avoid disrupting hemline hand-embroidery."
+        },
+        {
+          "type": "sleeve_adjustment",
+          "unit": "inches",
+          "min": -2,
+          "max": 2
+        }
+      ],
+      "requires_senior_designer_approval": true
+    },
+    {
+      "id": "kaftan_butterfly",
+      "display_name": "Kaftans, Farasha & Butterfly Abayas",
+      "required_measurements": [
+        "height",
+        "bust",
+        "fit_preference"
+      ],
+      "optional_measurements": [
+        "hips"
+      ],
+      "allowed_alterations": [
+        {
+          "type": "length_adjustment",
+          "unit": "inches",
+          "min": -6,
+          "max": 6
+        },
+        {
+          "type": "inner_tie_belt",
+          "options": ["Included", "No Belt"]
+        }
+      ]
+    }
+  ]
+}

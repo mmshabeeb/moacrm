@@ -1,0 +1,113 @@
+{
+  "unit_conversions": {
+    "cm_to_inches": 0.393701,
+    "inches_to_cm": 2.54,
+    "feet_to_cm": 30.48
+  },
+  "standard_sizes": [
+    {
+      "size": 52,
+      "height_ft": 5.0,
+      "height_cm": 153,
+      "abaya_length_inches": 52,
+      "bust_flat_inches": 21,
+      "bust_circumference_inches": 42
+    },
+    {
+      "size": 53,
+      "height_ft": 5.1,
+      "height_cm": 155,
+      "abaya_length_inches": 53,
+      "bust_flat_inches": 21,
+      "bust_circumference_inches": 42
+    },
+    {
+      "size": 54,
+      "height_ft": 5.2,
+      "height_cm": 158,
+      "abaya_length_inches": 54,
+      "bust_flat_inches": 22,
+      "bust_circumference_inches": 44
+    },
+    {
+      "size": 55,
+      "height_ft": 5.3,
+      "height_cm": 161,
+      "abaya_length_inches": 55,
+      "bust_flat_inches": 22,
+      "bust_circumference_inches": 44
+    },
+    {
+      "size": 56,
+      "height_ft": 5.4,
+      "height_cm": 164,
+      "abaya_length_inches": 56,
+      "bust_flat_inches": 23,
+      "bust_circumference_inches": 46
+    },
+    {
+      "size": 57,
+      "height_ft": 5.5,
+      "height_cm": 167,
+      "abaya_length_inches": 57,
+      "bust_flat_inches": 23,
+      "bust_circumference_inches": 46
+    },
+    {
+      "size": 58,
+      "height_ft": 5.6,
+      "height_cm": 170,
+      "abaya_length_inches": 58,
+      "bust_flat_inches": 24,
+      "bust_circumference_inches": 48
+    },
+    {
+      "size": 59,
+      "height_ft": 5.7,
+      "height_cm": 173,
+      "abaya_length_inches": 59,
+      "bust_flat_inches": 24,
+      "bust_circumference_inches": 48
+    },
+    {
+      "size": 60,
+      "height_ft": 5.8,
+      "height_cm": 176,
+      "abaya_length_inches": 60,
+      "bust_flat_inches": 25,
+      "bust_circumference_inches": 50
+    }
+  ],
+  "fit_profiles": {
+    "fitted": {
+      "ease_bust_inches": 2,
+      "description": "Tailored closer to the body with modest contouring."
+    },
+    "regular": {
+      "ease_bust_inches": 4,
+      "description": "Standard modest abaya drape with comfortable room."
+    },
+    "loose": {
+      "ease_bust_inches": 6,
+      "description": "Relaxed silhouette with ample room around chest and arms."
+    },
+    "extra_loose": {
+      "ease_bust_inches": 8,
+      "description": "Very wide, oversized drape for maximum modesty and flow."
+    }
+  },
+  "alteration_rules": {
+    "length_customisation": {
+      "allowed": true,
+      "max_shorten_inches": 6,
+      "max_lengthen_inches": 6,
+      "default_unit": "inches"
+    },
+    "sleeve_customisation": {
+      "allowed": true,
+      "max_shorten_inches": 4,
+      "max_lengthen_inches": 4,
+      "options": ["Standard", "Extra Room (Loose)", "Fitted Wrist", "Elastic Cuff", "Button Cuff"]
+    }
+  }
+}

@@ -1,0 +1,10 @@
+# MOA Theme App Extension Configuration
+# Online Store 2.0 Theme Block for Product Detail Pages
+
+name = "moa-designer-block"
+type = "theme"
+
+[meta]
+schema_version = "1.0"
+title = "MOA AI Designer & Customisation Assistant"
+description = "Embed bespoke tailoring and WhatsApp-style customisation consultations on product pages"

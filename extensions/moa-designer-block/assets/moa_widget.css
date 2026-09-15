@@ -1,0 +1,637 @@
+/**
+ * Mall of Abayas (MOA) - Luxury Storefront PDP Customisation Widget Styles
+ * Optimized for Mobile & Web: Typography, Proportions, Theme Harmony & Responsiveness
+ */
+
+:root {
+  --moa-brand-black: #111111;
+  --moa-brand-dark: #1e1a18;
+  --moa-brand-gold: #9e6d38;
+  --moa-brand-gold-hover: #845728;
+  --moa-brand-gold-light: #fbf5ee;
+  --moa-brand-gold-border: #ecdcc9;
+  --moa-brand-emerald: #008069;
+  --moa-surface-bg: #fdfbf9;
+  --moa-card-bg: #ffffff;
+  --moa-bubble-in: #ffffff;
+  --moa-bubble-out: #f5ede4;
+  --moa-border-subtle: #e8e2d9;
+  --moa-border-divider: #efe9e0;
+  --moa-text-main: #1f1f1f;
+  --moa-text-muted: #6b665f;
+  --moa-font-family: inherit, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Base Container */
+.moa-customisation-container {
+  margin: 1.25rem 0;
+  font-family: var(--moa-font-family);
+  box-sizing: border-box;
+  color: var(--moa-text-main);
+  -webkit-font-smoothing: antialiased;
+}
+
+.moa-customisation-container * {
+  box-sizing: border-box;
+}
+
+/* --------------------------------------------------------------------------
+   1. PDP Checkbox Toggle Box
+   -------------------------------------------------------------------------- */
+.moa-toggle-wrapper {
+  background: var(--moa-card-bg);
+  border: 1.5px solid var(--moa-border-subtle);
+  border-radius: 12px;
+  padding: 12px 16px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+
+.moa-toggle-wrapper:hover {
+  border-color: var(--moa-brand-gold);
+  background: var(--moa-surface-bg);
+  box-shadow: 0 4px 14px rgba(158, 109, 56, 0.09);
+}
+
+.moa-checkbox-label {
+  display: flex;
+  align-items: flex-start;
+  cursor: pointer;
+  gap: 12px;
+  user-select: none;
+  margin: 0;
+}
+
+.moa-checkbox-input {
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+  accent-color: var(--moa-brand-gold);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.moa-checkbox-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.moa-checkbox-title {
+  font-size: 0.96rem; /* ~15px */
+  font-weight: 700;
+  color: var(--moa-brand-black);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  line-height: 1.3;
+}
+
+.moa-badge-free {
+  font-size: 0.72rem;
+  background: #fbf3e6;
+  color: var(--moa-brand-gold);
+  border: 1px solid #ecdac4;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.moa-checkbox-subtext {
+  font-size: 0.82rem; /* ~13px */
+  color: var(--moa-text-muted);
+  line-height: 1.45;
+}
+
+/* --------------------------------------------------------------------------
+   2. Floating Circular Launcher Bubble (Bottom-Right)
+   -------------------------------------------------------------------------- */
+.moa-floating-launcher {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--moa-brand-black);
+  color: #ffffff;
+  padding: 8px 18px 8px 10px;
+  border-radius: 35px;
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.28);
+  border: 2px solid var(--moa-brand-gold);
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+  animation: moaLauncherPop 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.moa-floating-launcher:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 14px 38px rgba(158, 109, 56, 0.38);
+  background: #1f1b19;
+}
+
+.moa-launcher-avatar {
+  width: 36px;
+  height: 36px;
+  background: var(--moa-brand-gold);
+  color: #ffffff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+}
+
+.moa-launcher-text {
+  font-size: 0.88rem; /* ~14px */
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+.moa-launcher-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: #e11d48;
+  color: #ffffff;
+  font-size: 0.7rem;
+  font-weight: 800;
+  border-radius: 12px;
+  padding: 2px 7px;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  animation: moaBadgePulse 2s infinite ease-in-out;
+}
+
+@keyframes moaBadgePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+@keyframes moaLauncherPop {
+  from { opacity: 0; transform: translateY(20px) scale(0.85); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* --------------------------------------------------------------------------
+   3. Floating Modal Window (Desktop Default)
+   -------------------------------------------------------------------------- */
+.moa-floating-window {
+  position: fixed;
+  bottom: 85px;
+  right: 24px;
+  z-index: 999999;
+  width: 400px;
+  max-width: calc(100vw - 32px);
+  height: 540px;
+  max-height: calc(100vh - 110px);
+  border: 1.5px solid var(--moa-border-subtle);
+  border-radius: 20px;
+  background: var(--moa-surface-bg);
+  box-shadow: 0 18px 56px rgba(0, 0, 0, 0.22);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transform-origin: bottom right;
+  animation: moaModalFloatIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes moaModalFloatIn {
+  from { opacity: 0; transform: translateY(25px) scale(0.92); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Atelier Header */
+.moa-wa-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--moa-brand-black);
+  color: #ffffff;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+
+.moa-wa-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.moa-wa-avatar {
+  width: 38px;
+  height: 38px;
+  background: var(--moa-brand-gold);
+  color: #ffffff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  flex-shrink: 0;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.moa-wa-title {
+  display: block;
+  font-size: 0.94rem; /* ~15px */
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.2px;
+}
+
+.moa-wa-status {
+  display: block;
+  font-size: 0.74rem; /* ~12px */
+  color: #d4af37; /* Warm Gold */
+  font-weight: 500;
+  margin-top: 1px;
+}
+
+.moa-wa-minimize-btn {
+  background: rgba(255, 255, 255, 0.12);
+  border: none;
+  font-size: 1.4rem;
+  cursor: pointer;
+  color: #ffffff;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.15s ease;
+}
+
+.moa-wa-minimize-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.08);
+}
+
+/* --------------------------------------------------------------------------
+   4. Chat Messages Thread (Clean Luxury Layout)
+   -------------------------------------------------------------------------- */
+.moa-wa-chat-thread {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background-color: var(--moa-surface-bg);
+  scroll-behavior: smooth;
+}
+
+.moa-wa-bubble {
+  max-width: 88%;
+  padding: 12px 15px;
+  border-radius: 14px;
+  font-size: 0.92rem; /* ~14.5px crisp readable text */
+  line-height: 1.55;
+  position: relative;
+  word-break: break-word;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.moa-wa-incoming {
+  background: var(--moa-bubble-in);
+  border: 1px solid var(--moa-border-subtle);
+  align-self: flex-start;
+  border-top-left-radius: 3px;
+  color: var(--moa-text-main);
+}
+
+.moa-wa-outgoing {
+  background: var(--moa-bubble-out);
+  border: 1px solid var(--moa-brand-gold-border);
+  align-self: flex-end;
+  border-top-right-radius: 3px;
+  color: var(--moa-brand-black);
+}
+
+.moa-wa-author {
+  font-size: 0.74rem; /* ~12px */
+  font-weight: 700;
+  color: var(--moa-brand-gold);
+  margin-bottom: 4px;
+  display: block;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.moa-wa-meta {
+  font-size: 0.7rem;
+  color: #8c857b;
+  text-align: right;
+  margin-top: 5px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Typing Indicator */
+.moa-typing-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 10px 14px;
+  background: #ffffff;
+  border: 1px solid var(--moa-border-subtle);
+  border-radius: 14px;
+  align-self: flex-start;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+}
+
+.moa-typing-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--moa-brand-gold);
+  border-radius: 50%;
+  animation: moaPulse 1.2s infinite ease-in-out;
+}
+
+.moa-typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.moa-typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes moaPulse {
+  0%, 100% { transform: scale(0.6); opacity: 0.4; }
+  50% { transform: scale(1.1); opacity: 1; }
+}
+
+/* --------------------------------------------------------------------------
+   5. Quick Recommendation Chips
+   -------------------------------------------------------------------------- */
+.moa-quick-chips {
+  display: flex;
+  gap: 8px;
+  padding: 10px 14px;
+  overflow-x: auto;
+  background: #f7f3ee;
+  border-top: 1px solid var(--moa-border-divider);
+  flex-shrink: 0;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.moa-quick-chips::-webkit-scrollbar {
+  display: none;
+}
+
+.moa-quick-chip {
+  background: #ffffff;
+  border: 1px solid var(--moa-border-subtle);
+  border-radius: 20px;
+  padding: 7px 13px;
+  font-size: 0.82rem; /* ~13px */
+  font-weight: 600;
+  color: var(--moa-text-main);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.moa-quick-chip:hover,
+.moa-quick-chip:active {
+  background: var(--moa-brand-black);
+  border-color: var(--moa-brand-black);
+  color: #ffffff;
+}
+
+/* --------------------------------------------------------------------------
+   6. Sizing & Customisation Summary Card
+   -------------------------------------------------------------------------- */
+.moa-verification-container {
+  background: #ffffff;
+  border-top: 1px solid var(--moa-border-divider);
+  padding: 12px 14px;
+  flex-shrink: 0;
+}
+
+.moa-verification-card {
+  background: #fdfaf7;
+  border: 1.5px solid var(--moa-brand-gold);
+  border-radius: 12px;
+  padding: 12px 14px;
+  box-shadow: 0 4px 14px rgba(158, 109, 56, 0.08);
+}
+
+.moa-vc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.moa-vc-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--moa-brand-black);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.moa-vc-badge {
+  background: #f0e6dc;
+  color: var(--moa-brand-gold);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 20px;
+  border: 1px solid #e2d2c1;
+}
+
+.moa-vc-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.moa-vc-chip {
+  background: #ffffff;
+  border: 1px solid var(--moa-border-subtle);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 0.82rem;
+}
+
+.moa-vc-chip span {
+  color: var(--moa-text-muted);
+  margin-right: 3px;
+}
+
+.moa-vc-chip strong {
+  color: var(--moa-brand-black);
+}
+
+.moa-vc-confirm-btn {
+  width: 100%;
+  background: var(--moa-brand-black);
+  color: #ffffff;
+  border: none;
+  border-radius: 30px;
+  padding: 11px 16px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+}
+
+.moa-vc-confirm-btn:hover {
+  background: #2b2b2b;
+}
+
+.moa-vc-confirmed-banner {
+  background: #fbf9f5;
+  border: 1.5px solid var(--moa-brand-emerald);
+  border-radius: 10px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: var(--moa-brand-emerald);
+  font-weight: 700;
+}
+
+/* --------------------------------------------------------------------------
+   7. Storefront Bottom Input Toolbar
+   -------------------------------------------------------------------------- */
+.moa-wa-input-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f7f3ee;
+  border-top: 1px solid var(--moa-border-divider);
+  padding: 10px 14px;
+  flex-shrink: 0;
+}
+
+.moa-wa-input-field {
+  flex: 1;
+  background: #ffffff;
+  border: 1px solid var(--moa-border-subtle);
+  border-radius: 24px;
+  padding: 10px 16px;
+  font-size: 0.9rem; /* ~14.5px */
+  outline: none;
+  transition: border-color 0.15s ease;
+  color: var(--moa-brand-black);
+}
+
+.moa-wa-input-field:focus {
+  border-color: var(--moa-brand-gold);
+}
+
+.moa-wa-input-field::placeholder {
+  color: #948e86;
+  font-size: 0.84rem;
+}
+
+.moa-wa-icon-btn {
+  background: transparent;
+  border: none;
+  font-size: 1.25rem;
+  cursor: pointer;
+  color: var(--moa-brand-gold);
+  padding: 4px;
+  flex-shrink: 0;
+}
+
+.moa-wa-send-btn {
+  width: 38px;
+  height: 38px;
+  background: var(--moa-brand-black);
+  color: #ffffff;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.moa-wa-send-btn:hover {
+  background: var(--moa-brand-gold);
+  transform: scale(1.05);
+}
+
+/* --------------------------------------------------------------------------
+   8. Mobile Optimization (Full Responsiveness for Phones)
+   -------------------------------------------------------------------------- */
+@media (max-width: 600px) {
+  .moa-floating-window {
+    bottom: 0;
+    right: 0;
+    left: 0;
+    width: 100%;
+    max-width: 100%;
+    height: 80vh;
+    max-height: 80vh;
+    border-radius: 20px 20px 0 0;
+    border-bottom: none;
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.25);
+  }
+
+  .moa-wa-header {
+    padding: 14px 16px;
+  }
+
+  .moa-floating-launcher {
+    bottom: 16px;
+    right: 16px;
+    padding: 8px 16px 8px 8px;
+  }
+
+  .moa-launcher-text {
+    font-size: 0.82rem;
+  }
+
+  .moa-wa-chat-thread {
+    padding: 14px 12px;
+  }
+
+  .moa-wa-bubble {
+    max-width: 90%;
+    padding: 11px 13px;
+    font-size: 0.9rem;
+  }
+
+  .moa-quick-chips {
+    padding: 8px 12px;
+    gap: 6px;
+  }
+
+  .moa-quick-chip {
+    padding: 6px 11px;
+    font-size: 0.78rem;
+  }
+
+  .moa-wa-input-toolbar {
+    padding: 10px 12px;
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+  }
+}
