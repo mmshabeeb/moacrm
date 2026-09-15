@@ -147,6 +147,11 @@
           <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
           <span>Size Matrix</span>
         </button>
+
+        <button class="moa-nav-btn" data-tab="tab-ai-training" id="nav-btn-ai-training" style="border-left: 3px solid #8b5a2b; background: rgba(139, 90, 43, 0.05);">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+          <span>🧠 AI Training Centre</span>
+        </button>
       </nav>
 
       <!-- Role Status Notice in Sidebar -->
@@ -561,6 +566,85 @@
             </tbody>
           </table>
         </div>
+      </section>
+
+      <!-- TAB 6: AI Designer Training Centre & Specification -->
+      <section id="tab-ai-training" class="moa-tab-pane">
+        <div class="moa-pane-header">
+          <div>
+            <h2>🧠 AI Designer Training Centre & Dialogue Specification</h2>
+            <p class="moa-subtext">Train, configure, and evaluate the Gemini AI Personal Abaya Stylist in real-time.</p>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button class="moa-btn moa-btn-outline" onclick="loadAiTrainingSpec()">🔄 Refresh Spec</button>
+            <button class="moa-btn moa-btn-gold" onclick="saveCustomPromptOverride()">💾 Save Training Config</button>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1.1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+          
+          <!-- Master Prompt & Personality -->
+          <div class="moa-card" style="background:#ffffff; border-radius:10px; padding:1.25rem; border:1px solid #e2e8f0;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+              <h3 style="font-size:1rem; font-weight:700; color:#111;">Master System Prompt & Atelier Identity</h3>
+              <span class="role-badge role-admin" id="ai-model-badge">Gemini 3.6 Flash</span>
+            </div>
+            <p style="font-size:0.8rem; color:#666; margin-bottom:10px;">
+              Trained personality: Luxury modest-fashion consultant in Dubai. Listens before recommending, asks one question at a time.
+            </p>
+            <textarea id="ai-system-prompt-textarea" rows="14" style="width:100%; padding:10px; font-family:monospace; font-size:0.78rem; line-height:1.4; border:1px solid #cbd5e1; border-radius:8px; background:#f8fafc; resize:vertical;"></textarea>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+              <small style="color:#64748b;">Placeholders like <code>${productTitle}</code> are dynamically injected per garment.</small>
+              <button class="moa-btn moa-btn-outline" style="padding:4px 10px; font-size:0.75rem;" onclick="resetPromptToDefault()">Reset to Default</button>
+            </div>
+          </div>
+
+          <!-- Live Interactive AI Playground -->
+          <div class="moa-card" style="background:#ffffff; border-radius:10px; padding:1.25rem; border:1px solid #e2e8f0;">
+            <h3 style="font-size:1rem; font-weight:700; color:#111; margin-bottom:10px;">🎯 Interactive AI Test Playground</h3>
+            <p style="font-size:0.8rem; color:#666; margin-bottom:12px;">
+              Test customer queries and inspect Gemini's reasoning, intent recognition, and extracted measurements.
+            </p>
+
+            <div class="moa-form-group" style="margin-bottom:10px;">
+              <label style="font-size:0.78rem; font-weight:700;">Simulated Customer Input</label>
+              <div style="display:flex; gap:8px;">
+                <input type="text" id="playground-user-input" placeholder="e.g. Can you add a feeding zip and pockets for height 165cm?" style="flex:1; padding:8px 12px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem;" />
+                <button class="moa-btn moa-btn-gold" id="btn-run-playground" onclick="runPlaygroundTest()">🚀 Test AI</button>
+              </div>
+            </div>
+
+            <!-- Quick Test Scenario Pills -->
+            <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px;">
+              <button type="button" class="metric-chip" style="cursor:pointer; font-size:0.72rem;" onclick="setPlaygroundInput('Salam! I want to customise this abaya')">👋 Greeting</button>
+              <button type="button" class="metric-chip" style="cursor:pointer; font-size:0.72rem;" onclick="setPlaygroundInput('Can you make a feeding zip for nursing?')">🤱 Feeding Zip</button>
+              <button type="button" class="metric-chip" style="cursor:pointer; font-size:0.72rem;" onclick="setPlaygroundInput('I need pockets and +2 inch looser sleeves')">✨ Pockets & Sleeves</button>
+              <button type="button" class="metric-chip" style="cursor:pointer; font-size:0.72rem;" onclick="setPlaygroundInput('I am wearing 3-inch heels for my daughter\'s wedding')">👠 Heels / Wedding</button>
+              <button type="button" class="metric-chip" style="cursor:pointer; font-size:0.72rem;" onclick="setPlaygroundInput('Can you completely change the neckline style?')">🚨 Out-of-Scope</button>
+            </div>
+
+            <!-- Playground Live Output Box -->
+            <div id="playground-output-container" style="background:#f1f5f9; border-radius:8px; padding:12px; border:1px solid #cbd5e1; min-height:160px; font-size:0.82rem;">
+              <div style="color:#64748b; text-align:center; padding-top:40px;">Type a message or click a test pill above to evaluate live AI output.</div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Few-Shot Training Dialogue Library -->
+        <div class="moa-card" style="background:#ffffff; border-radius:10px; padding:1.25rem; border:1px solid #e2e8f0; margin-bottom:1.5rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <div>
+              <h3 style="font-size:1rem; font-weight:700; color:#111;">📚 Few-Shot Training Scenario Library (Section 11 & 18)</h3>
+              <p style="font-size:0.8rem; color:#666;">These approved customer-designer dialogue pairs guide Gemini's conversational style.</p>
+            </div>
+          </div>
+
+          <div id="training-scenarios-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:12px;">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
       </section>
 
     </main>

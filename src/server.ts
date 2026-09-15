@@ -9,6 +9,7 @@ import { settingsRouter } from './routes/settingsRoutes';
 import { userRouter } from './routes/userRoutes';
 import { mediaRouter } from './routes/mediaRoutes';
 import { routingRouter } from './routes/routingRoutes';
+import { aiTrainingRouter } from './routes/aiTrainingRoutes';
 import { handleShopifyOrderCreateWebhook } from './webhooks/shopifyOrderWebhook';
 
 dotenv.config();
@@ -33,6 +34,7 @@ app.use('/api/settings', settingsRouter);
 app.use('/api/users', userRouter);
 app.use('/api/media', mediaRouter);
 app.use('/api/routing', routingRouter);
+app.use('/api/ai', aiTrainingRouter);
 
 // Shopify Webhook endpoint
 app.post('/webhooks/shopify/orders/create', handleShopifyOrderCreateWebhook);

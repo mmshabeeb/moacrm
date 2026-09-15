@@ -2028,3 +2028,201 @@ async function deleteUser(userId) {
     console.error('Failed to delete user', err);
   }
 }
+
+// =======================================================
+// TAB NAVIGATION & SWITCHING
+// =======================================================
+function initTabs() {
+  const navBtns = document.querySelectorAll('.moa-nav-btn');
+  navBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetTabId = btn.getAttribute('data-tab');
+      if (!targetTabId) return;
+
+      navBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const panes = document.querySelectorAll('.moa-tab-pane');
+      panes.forEach(p => p.classList.remove('active'));
+
+      const targetPane = document.getElementById(targetTabId);
+      if (targetPane) {
+        targetPane.classList.add('active');
+        if (targetTabId === 'tab-ai-training') {
+          loadAiTrainingSpec();
+        }
+      }
+    });
+  });
+}
+
+// =======================================================
+// AI TRAINING CENTRE & SPECIFICATION (Section 11, 18 & 21)
+// =======================================================
+let currentTrainingSpec = null;
+
+async function loadAiTrainingSpec() {
+  try {
+    const res = await fetch('/api/ai/training-spec');
+    const data = await res.json();
+    if (data.success) {
+      currentTrainingSpec = data;
+      
+      const badge = document.getElementById('ai-model-badge');
+      if (badge) badge.innerText = `${data.provider.toUpperCase()} (${data.modelName})`;
+
+      const textarea = document.getElementById('ai-system-prompt-textarea');
+      if (textarea) {
+        textarea.value = data.customPromptOverride || data.systemPrompt;
+      }
+
+      renderTrainingScenarios(data.trainingScenarios || []);
+    }
+  } catch (err) {
+    console.error('Failed to load AI training spec', err);
+  }
+}
+
+function renderTrainingScenarios(scenarios) {
+  const grid = document.getElementById('training-scenarios-grid');
+  if (!grid) return;
+
+  grid.innerHTML = scenarios.map(s => `
+    <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:12px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+        <strong style="font-size:0.8rem; color:#8b5a2b;">${s.scenario}</strong>
+        <span class="role-badge role-subadmin" style="font-size:0.68rem;">${s.intent || 'TRAINING'}</span>
+      </div>
+      <div style="background:#ffffff; border-radius:6px; padding:6px 8px; border:1px solid #e2e8f0; margin-bottom:6px; font-size:0.78rem;">
+        <span style="color:#64748b; font-weight:700;">Customer:</span> "${s.customer_message}"
+      </div>
+      <div style="background:#ecfdf5; border-radius:6px; padding:6px 8px; border:1px solid #a7f3d0; font-size:0.78rem; color:#065f46;">
+        <span style="font-weight:700;">AI Stylist:</span> "${s.ideal_response}"
+      </div>
+      ${s.rules && s.rules.length ? `
+        <div style="margin-top:6px; font-size:0.7rem; color:#64748b;">
+          ${s.rules.map(r => `• ${r}`).join('<br>')}
+        </div>
+      ` : ''}
+    </div>
+  `).join('');
+}
+
+async function saveCustomPromptOverride() {
+  const textarea = document.getElementById('ai-system-prompt-textarea');
+  if (!textarea) return;
+
+  const customPrompt = textarea.value.trim();
+  try {
+    const res = await fetch('/api/ai/training-spec', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ customPromptOverride: customPrompt })
+    });
+    const data = await res.json();
+    if (data.success) {
+      alert('✅ AI Training Specification and Master Prompt saved successfully!');
+    }
+  } catch (err) {
+    console.error('Failed to save training config', err);
+    alert('Failed to save prompt configuration');
+  }
+}
+
+async function resetPromptToDefault() {
+  if (!confirm('Reset Master Prompt to factory default training spec?')) return;
+  try {
+    await fetch('/api/ai/training-spec', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ customPromptOverride: null })
+    });
+    await loadAiTrainingSpec();
+  } catch (err) {
+    console.error('Failed to reset prompt', err);
+  }
+}
+
+function setPlaygroundInput(text) {
+  const input = document.getElementById('playground-user-input');
+  if (input) {
+    input.value = text;
+    input.focus();
+  }
+}
+
+async function runPlaygroundTest() {
+  const input = document.getElementById('playground-user-input');
+  const outContainer = document.getElementById('playground-output-container');
+  const btn = document.getElementById('btn-run-playground');
+  if (!input || !outContainer) return;
+
+  const userMessage = input.value.trim();
+  if (!userMessage) return;
+
+  if (btn) {
+    btn.disabled = true;
+    btn.innerText = 'Evaluating...';
+  }
+
+  outContainer.innerHTML = `
+    <div style="text-align:center; padding:20px; color:#64748b;">
+      <span class="spinner-small" style="display:inline-block; margin-right:6px;"></span>
+      Gemini AI is analyzing customer intent and evaluating atelier response...
+    </div>
+  `;
+
+  try {
+    const res = await fetch('/api/ai/test-turn', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userMessage,
+        productTitle: 'Royal Silk Velvet Abaya',
+        productCategory: 'occasion_luxury'
+      })
+    });
+
+    const data = await res.json();
+    if (btn) {
+      btn.disabled = false;
+      btn.innerText = '🚀 Test AI';
+    }
+
+    if (data.success && data.result) {
+      const r = data.result;
+      const intent = r.intent || 'GENERAL';
+      const extractedHeight = r.extractedHeightCm ? `${r.extractedHeightCm} cm` : 'Not provided';
+      const extractedBust = r.extractedBustInches ? `${r.extractedBustInches}"` : 'Not provided';
+      const fit = r.fitPreference ? r.fitPreference.toUpperCase() : 'Not provided';
+      const addOns = r.customRequests && r.customRequests.length ? r.customRequests.join(', ') : 'None';
+      const isComplete = r.isComplete ? '✅ Complete (Ready for in-chat card)' : '⏳ Incomplete (Guiding customer)';
+      const escalation = r.requiresEscalation ? `🚨 Escalate: ${r.escalationReason || 'Senior review'}` : '✅ AI Handling';
+
+      outContainer.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <span class="role-badge role-admin" style="font-size:0.72rem;">Intent: ${intent}</span>
+          <span style="font-size:0.75rem; color:#64748b;">${isComplete} • ${escalation}</span>
+        </div>
+        <div style="background:#ffffff; border-radius:6px; padding:10px; border:1px solid #cbd5e1; margin-bottom:8px; font-size:0.85rem; line-height:1.45; color:#1e293b;">
+          <strong style="color:#8b5a2b;">AI Stylist Reply:</strong><br>
+          ${r.replyMessage}
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(120px, 1fr)); gap:6px; font-size:0.72rem; color:#475569;">
+          <div class="metric-chip">Height: <strong>${extractedHeight}</strong></div>
+          <div class="metric-chip">Bust: <strong>${extractedBust}</strong></div>
+          <div class="metric-chip">Fit: <strong>${fit}</strong></div>
+          <div class="metric-chip">Add-Ons: <strong>${addOns}</strong></div>
+        </div>
+      `;
+    } else {
+      outContainer.innerHTML = `<div style="color:#ef4444; padding:10px;">Error: ${data.error || 'Failed to evaluate prompt'}</div>`;
+    }
+  } catch (err) {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerText = '🚀 Test AI';
+    }
+    outContainer.innerHTML = `<div style="color:#ef4444; padding:10px;">Network error connecting to AI evaluation endpoint.</div>`;
+  }
+}
