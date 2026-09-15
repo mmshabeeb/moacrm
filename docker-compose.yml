@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  moacrm:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: moacrm
+    restart: always
+    ports:
+      - "3001:3001"
+    env_file:
+      - .env
+    environment:
+      - PORT=3001
+      - NODE_ENV=production
+      - MOA_STORE_DOMAIN=in.mallofabayas.com
+      - AI_PROVIDER=gemini
+      - AI_MODEL_NAME=gemini-1.5-flash
