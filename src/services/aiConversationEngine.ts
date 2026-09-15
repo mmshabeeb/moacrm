@@ -88,6 +88,11 @@ export class MOAAIConversationEngine {
 
       if (aiResult) {
         // Merge extracted values
+        const mergedCustomRequests = Array.from(new Set([
+          ...(currentRecord.custom_requests || []),
+          ...(aiResult.customRequests || [])
+        ]));
+
         const updated: Partial<StructuredCustomisationRecord> = {
           ...currentRecord,
           ...(aiResult.extractedHeightCm && { height_cm: aiResult.extractedHeightCm }),
@@ -95,7 +100,8 @@ export class MOAAIConversationEngine {
           ...(aiResult.fitPreference && { fit_preference: aiResult.fitPreference }),
           ...(aiResult.lengthAdjustmentInches !== undefined && aiResult.lengthAdjustmentInches !== null && { length_adjustment_inches: aiResult.lengthAdjustmentInches }),
           ...(aiResult.sleeveAdjustmentInches !== undefined && aiResult.sleeveAdjustmentInches !== null && { sleeve_adjustment_inches: aiResult.sleeveAdjustmentInches }),
-          ...(aiResult.sleeveStyle && { sleeve_style: aiResult.sleeveStyle })
+          ...(aiResult.sleeveStyle && { sleeve_style: aiResult.sleeveStyle }),
+          ...(mergedCustomRequests.length > 0 && { custom_requests: mergedCustomRequests })
         };
 
         // Recalculate recommendation using trained matrix
@@ -143,8 +149,9 @@ export class MOAAIConversationEngine {
               fit: fitLabel,
               lengthAdjustment: lenAdj,
               sleeveAdjustment: sleeveAdj,
-              specialNotes: updated.sleeve_style || (updated.custom_requests ? updated.custom_requests.join(', ') : 'None')
-            },
+              specialNotes: updated.sleeve_style || (updated.custom_requests ? updated.custom_requests.join(', ') : 'None'),
+              addOns: updated.custom_requests || []
+            } as any,
             escalationTriggered: false
           };
         }
