@@ -12,7 +12,21 @@
       this.productId = this.container.getAttribute('data-product-id') || '10482';
       this.productTitle = this.container.getAttribute('data-product-title') || document.title || 'Royal Silk Velvet Abaya';
       this.productCategory = this.container.getAttribute('data-product-category') || 'abaya_standard';
-      this.apiBase = window.MOA_CRM_BASE_URL || window.location.origin;
+
+      // Smart API Base URL: auto-detects https://ai.mallofabayas.com from script tag or fallback
+      let detectedOrigin = 'https://ai.mallofabayas.com';
+      try {
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+          detectedOrigin = window.location.origin;
+        } else if (document.currentScript && document.currentScript.src) {
+          const scriptUrl = new URL(document.currentScript.src);
+          if (scriptUrl.origin && !scriptUrl.origin.includes('shopify.com')) {
+            detectedOrigin = scriptUrl.origin;
+          }
+        }
+      } catch (e) {}
+
+      this.apiBase = window.MOA_CRM_BASE_URL || detectedOrigin;
 
       // Session token persistence
       this.sessionKey = `moa_sess_${this.productId}`;
