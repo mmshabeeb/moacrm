@@ -146,6 +146,100 @@ chatRouter.post('/confirm', async (req: Request, res: Response) => {
 });
 
 /**
+ * GET /api/chat/sessions
+ * Returns all active customer storefront chat sessions for CRM live monitoring
+ */
+chatRouter.get('/sessions', (req: Request, res: Response) => {
+  try {
+    const sessionsList = Array.from(activeSessions.entries()).map(([token, session]) => {
+      const lastMsg = session.history[session.history.length - 1];
+      const preview = lastMsg ? lastMsg.text : 'Customer started consultation';
+      const lastTime = lastMsg?.timestamp ? new Date(lastMsg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) : 'Just now';
+      
+      const record = session.record || {};
+      const isEscalated = record.state === 'HUMAN_DESIGNER_CONNECTED' || record.state === 'HUMAN_REVIEW_REQUIRED';
+      const isClaimed = !!record.claimed_by_id;
+
+      return {
+        id: record.id || token,
+        sessionToken: token,
+        name: `Customer (${session.productTitle ? session.productTitle.slice(0, 24) : 'Abaya Shopper'})`,
+        orderNumber: `#${record.id ? record.id.replace('MOA-CUS-', '') : 'PDP'}`,
+        avatar: '👗',
+        avatarColor: '#00a884',
+        product: session.productTitle,
+        baseSize: record.recommended_size ? `${record.recommended_size}` : 'Pending',
+        height: record.height_cm ? `${record.height_cm} cm` : 'Not provided',
+        bust: record.bust_inches ? `${record.bust_inches}"` : 'Not provided',
+        fit: (record.fit_preference || 'regular').toUpperCase(),
+        sleeve: record.sleeve_adjustment_inches ? `${record.sleeve_adjustment_inches > 0 ? '+' : ''}${record.sleeve_adjustment_inches}"` : (record.sleeve_style || 'Standard'),
+        length: record.length_adjustment_inches ? `${record.length_adjustment_inches > 0 ? '+' : ''}${record.length_adjustment_inches}"` : 'Standard',
+        status: isClaimed ? `online • claimed by ${record.claimed_by_name}` : (isEscalated ? 'online • waiting in unassigned queue' : 'online • chatting with AI Designer on PDP'),
+        time: lastTime,
+        preview: preview,
+        unread: 1,
+        claimedBy: record.claimed_by_name || null,
+        claimedById: record.claimed_by_id || null,
+        claimedByRole: record.claimed_by_role || null,
+        isAIHandling: !isEscalated && !isClaimed,
+        messages: session.history.map(m => ({
+          type: 'text',
+          incoming: m.sender === 'user',
+          author: m.sender === 'user' ? 'Customer' : (m.sender === 'senior_designer' ? (record.claimed_by_name || 'Senior Designer') : 'MOA AI Designer'),
+          text: m.text,
+          time: m.timestamp ? new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) : 'Just now',
+          ticks: m.sender === 'ai' ? '✓✓' : undefined
+        }))
+      };
+    });
+
+    return res.json({ success: true, sessions: sessionsList });
+  } catch (error: any) {
+    return res.status(500).json({ error: 'Failed to fetch sessions' });
+  }
+});
+
+/**
+ * POST /api/chat/designer-message
+ * Staff / Senior Designer sends a direct message to a storefront customer
+ */
+chatRouter.post('/designer-message', (req: Request, res: Response) => {
+  try {
+    const { sessionId, sessionToken, message, designerName, designerId } = req.body;
+    const targetToken = sessionToken || sessionId;
+
+    let targetSession = activeSessions.get(targetToken);
+    if (!targetSession) {
+      // Look up by record.id
+      for (const [tok, sess] of activeSessions.entries()) {
+        if (sess.record.id === targetToken || tok === targetToken) {
+          targetSession = sess;
+          break;
+        }
+      }
+    }
+
+    if (!targetSession) {
+      return res.status(404).json({ error: 'Session not found' });
+    }
+
+    targetSession.history.push({
+      sender: 'senior_designer',
+      text: message,
+      timestamp: new Date().toISOString()
+    });
+
+    targetSession.record.state = 'HUMAN_DESIGNER_CONNECTED';
+    if (designerName) targetSession.record.claimed_by_name = designerName;
+    if (designerId) targetSession.record.claimed_by_id = designerId;
+
+    return res.json({ success: true, message: 'Message delivered to storefront' });
+  } catch (error: any) {
+    return res.status(500).json({ error: 'Failed to deliver designer message' });
+  }
+});
+
+/**
  * POST /api/chat/reset
  * Explicitly reset a customer's consultation session to a fresh state
  */

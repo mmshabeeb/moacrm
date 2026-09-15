@@ -56,10 +56,13 @@ export interface StructuredCustomisationRecord {
   requires_extra_charge: boolean;
   extra_charge_amount?: number;
   
-  // Verification
+  // Verification & Staff Assignment
   customer_confirmed: boolean;
   confirmed_at?: string;
   cart_token?: string;
+  claimed_by_id?: string;
+  claimed_by_name?: string;
+  claimed_by_role?: string;
 }
 
 export interface EscalationDossier {

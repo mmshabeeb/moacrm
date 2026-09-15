@@ -40,6 +40,61 @@ let recordSeconds = 0;
 let allStaffUsers = [];
 
 // =======================================================
+// LIVE STOREFRONT SESSION SYNC & POLLING
+// =======================================================
+async function fetchLiveStorefrontSessions() {
+  try {
+    const res = await fetch('/api/chat/sessions');
+    const data = await res.json();
+    if (data.success && Array.isArray(data.sessions)) {
+      data.sessions.forEach(sess => {
+        consultationSessions[sess.id] = sess;
+      });
+
+      updateCategoryCounts();
+
+      // If viewing AI Chats tab, re-render and refresh detail view
+      if (document.getElementById('tab-ai-chats')?.classList.contains('active')) {
+        renderAIContactsList();
+        if (!activeAISessionId || !consultationSessions[activeAISessionId]) {
+          const aiIds = Object.keys(consultationSessions).filter(k => consultationSessions[k].isAIHandling);
+          if (aiIds.length > 0) loadAISessionDetail(aiIds[0]);
+        } else if (consultationSessions[activeAISessionId]) {
+          loadAISessionDetail(activeAISessionId);
+        }
+      }
+
+      // If viewing Live Consultations tab, re-render
+      if (document.getElementById('tab-consultations')?.classList.contains('active')) {
+        renderContactsList();
+        if (activeSessionId && consultationSessions[activeSessionId]) {
+          loadSessionDetail(activeSessionId);
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('Live session sync error:', err);
+  }
+}
+
+function initConsultations() {
+  renderContactsList();
+  if (activeSessionId && consultationSessions[activeSessionId]) {
+    loadSessionDetail(activeSessionId);
+  }
+}
+
+function initAIChats() {
+  renderAIContactsList();
+  if (activeAISessionId && consultationSessions[activeAISessionId]) {
+    loadAISessionDetail(activeAISessionId);
+  }
+  // Start auto-syncing storefront sessions every 2.5 seconds
+  fetchLiveStorefrontSessions();
+  setInterval(fetchLiveStorefrontSessions, 2500);
+}
+
+// =======================================================
 // INITIALIZATION & AUTHENTICATION
 // =======================================================
 document.addEventListener('DOMContentLoaded', async () => {
@@ -1609,6 +1664,19 @@ function sendDesignerReply() {
     session.time = time;
     renderContactsList();
     renderMessagesThread(session);
+
+    // Sync directly to storefront customer session on backend
+    fetch('/api/chat/designer-message', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sessionId: session.id,
+        sessionToken: session.sessionToken || session.id,
+        message: text,
+        designerName: author,
+        designerId: currentAuth.user?.id
+      })
+    }).catch(err => console.warn('Error sending designer reply to server:', err));
   }
 
   input.value = '';
