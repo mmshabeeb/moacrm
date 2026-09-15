@@ -155,10 +155,9 @@ async function handleLoginSubmit(e) {
 // Check Current Session Auth from Backend
 async function loadCurrentAuth() {
   const token = localStorage.getItem('moa_crm_token');
-  const authScreen = document.getElementById('moa-auth-screen');
 
   if (!token) {
-    if (authScreen) authScreen.classList.remove('moa-auth-hidden');
+    window.location.href = '/login.html';
     return false;
   }
 
@@ -172,16 +171,15 @@ async function loadCurrentAuth() {
       currentAuth.user = data.user;
       currentAuth.permissions = data.permissions;
       applyUserPermissions(data.user, data.permissions);
-      if (authScreen) authScreen.classList.add('moa-auth-hidden');
       return true;
     } else {
       localStorage.removeItem('moa_crm_token');
-      if (authScreen) authScreen.classList.remove('moa-auth-hidden');
+      window.location.href = '/login.html';
       return false;
     }
   } catch (err) {
     console.error('Failed to validate session token', err);
-    if (authScreen) authScreen.classList.remove('moa-auth-hidden');
+    window.location.href = '/login.html';
     return false;
   }
 }
@@ -202,14 +200,8 @@ async function handleLogout() {
   }
 
   localStorage.removeItem('moa_crm_token');
-  const authScreen = document.getElementById('moa-auth-screen');
-  if (authScreen) {
-    authScreen.classList.remove('moa-auth-hidden');
-    const pwdInput = document.getElementById('login-password');
-    if (pwdInput) pwdInput.value = '';
-    const alert = document.getElementById('auth-error-alert');
-    if (alert) alert.style.display = 'none';
-  }
+  localStorage.removeItem('moa_user_data');
+  window.location.href = '/login.html';
 }
 
 // User List and Management

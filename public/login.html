@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In - Mall of Abayas (MOA) CRM Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --gold-primary: #9e6d38;
+      --gold-light: #c59b6d;
+      --gold-dark: #7a5024;
+      --gold-bg: #fdfaf6;
+      --onyx-dark: #121212;
+      --onyx-card: #1a1a1a;
+      --onyx-border: #2e2e2e;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: radial-gradient(circle at 50% 20%, #1f1814 0%, #0d0d0d 100%);
+      color: #f1f5f9;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    .login-container {
+      width: 100%;
+      max-width: 440px;
+    }
+
+    .brand-crest {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .crest-icon {
+      width: 68px;
+      height: 68px;
+      margin: 0 auto 1rem auto;
+      background: linear-gradient(135deg, rgba(158, 109, 56, 0.2), rgba(197, 155, 109, 0.05));
+      border: 1px solid rgba(197, 155, 109, 0.4);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      box-shadow: 0 0 30px rgba(158, 109, 56, 0.2);
+    }
+
+    .brand-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: 3px;
+      color: #f7e7ce;
+      margin-bottom: 0.35rem;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    }
+
+    .brand-subtitle {
+      font-size: 0.82rem;
+      color: var(--gold-light);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+
+    .login-card {
+      background: rgba(26, 26, 26, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--onyx-border);
+      border-top: 1px solid rgba(197, 155, 109, 0.3);
+      border-radius: 20px;
+      padding: 2.25rem 2rem;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.03);
+    }
+
+    .card-heading {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 0.3rem;
+    }
+
+    .card-desc {
+      font-size: 0.82rem;
+      color: #94a3b8;
+      margin-bottom: 1.5rem;
+    }
+
+    .alert-box {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid #ef4444;
+      color: #fca5a5;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 0.84rem;
+      margin-bottom: 1.25rem;
+      display: none;
+      font-weight: 500;
+    }
+
+    .form-group {
+      margin-bottom: 1.2rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #cbd5e1;
+      margin-bottom: 6px;
+    }
+
+    .input-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 14px;
+      font-size: 1rem;
+      color: #64748b;
+      pointer-events: none;
+    }
+
+    .input-wrap input {
+      width: 100%;
+      background: #111111;
+      border: 1px solid #333333;
+      color: #ffffff;
+      padding: 12px 42px 12px 40px;
+      border-radius: 10px;
+      font-size: 0.92rem;
+      font-family: inherit;
+      transition: all 0.2s ease;
+    }
+
+    .input-wrap input:focus {
+      outline: none;
+      border-color: var(--gold-light);
+      background: #161616;
+      box-shadow: 0 0 0 3px rgba(197, 155, 109, 0.2);
+    }
+
+    .toggle-pwd {
+      position: absolute;
+      right: 12px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #64748b;
+      padding: 4px;
+      font-size: 1.1rem;
+      transition: color 0.2s;
+    }
+
+    .toggle-pwd:hover {
+      color: #cbd5e1;
+    }
+
+    .submit-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #9e6d38 0%, #7a5024 100%);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 13px;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 1.5rem;
+      box-shadow: 0 6px 20px rgba(158, 109, 56, 0.35);
+      transition: all 0.2s ease;
+    }
+
+    .submit-btn:hover {
+      background: linear-gradient(135deg, #b58147 0%, #8b5b29 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 8px 25px rgba(158, 109, 56, 0.45);
+    }
+
+    .submit-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .divider {
+      text-align: center;
+      position: relative;
+      margin: 1.75rem 0 1.25rem 0;
+    }
+
+    .divider::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .divider span {
+      position: relative;
+      background: #1a1a1a;
+      padding: 0 10px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: #64748b;
+      letter-spacing: 0.8px;
+    }
+
+    .quick-accounts {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .acc-card {
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid #2a2a2a;
+      border-radius: 10px;
+      padding: 9px 11px;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .acc-card:hover {
+      background: rgba(158, 109, 56, 0.12);
+      border-color: var(--gold-light);
+      transform: translateY(-2px);
+    }
+
+    .acc-role {
+      font-size: 0.62rem;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 4px;
+      display: inline-block;
+      align-self: flex-start;
+      margin-bottom: 2px;
+    }
+
+    .role-admin { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); }
+    .role-subadmin { background: rgba(99, 102, 241, 0.2); color: #a5b4fc; border: 1px solid rgba(99, 102, 241, 0.4); }
+    .role-designer { background: rgba(34, 197, 94, 0.2); color: #86efac; border: 1px solid rgba(34, 197, 94, 0.4); }
+
+    .acc-name {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #f1f5f9;
+    }
+
+    .acc-email {
+      font-size: 0.68rem;
+      color: #94a3b8;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .login-footer {
+      margin-top: 2rem;
+      text-align: center;
+      font-size: 0.78rem;
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-container">
+    <div class="brand-crest">
+      <div class="crest-icon">👗</div>
+      <h1 class="brand-title">MALL OF ABAYAS</h1>
+      <p class="brand-subtitle">Atelier CRM & Bespoke Production Portal</p>
+    </div>
+
+    <div class="login-card">
+      <h2 class="card-heading">Sign In to Atelier CRM</h2>
+      <p class="card-desc">Enter your username (email) and password to access the portal.</p>
+
+      <div id="error-alert" class="alert-box"></div>
+
+      <form id="login-form" onsubmit="handleFormSubmit(event)">
+        <div class="form-group">
+          <label for="input-email">Username (Email Address)</label>
+          <div class="input-wrap">
+            <span class="input-icon">✉️</span>
+            <input type="email" id="input-email" placeholder="name@mallofabayas.com" required autocomplete="email" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="input-password">Password</label>
+          <div class="input-wrap">
+            <span class="input-icon">🔒</span>
+            <input type="password" id="input-password" placeholder="••••••••••••" required autocomplete="current-password" />
+            <button type="button" class="toggle-pwd" onclick="togglePassword()" title="Show/Hide Password">👁️</button>
+          </div>
+        </div>
+
+        <button type="submit" id="btn-submit" class="submit-btn">
+          <span>Sign In</span> &rarr;
+        </button>
+      </form>
+
+      <div class="divider">
+        <span>1-CLICK QUICK ACCESS</span>
+      </div>
+
+      <div class="quick-accounts">
+        <div class="acc-card" onclick="quickFill('admin@mallofabayas.com', 'Admin@MOA2026')">
+          <span class="acc-role role-admin">ADMIN</span>
+          <span class="acc-name">Fatima (Admin)</span>
+          <span class="acc-email">admin@mallofabayas.com</span>
+        </div>
+
+        <div class="acc-card" onclick="quickFill('noura.subadmin@mallofabayas.com', 'SubAdmin@MOA2026')">
+          <span class="acc-role role-subadmin">SUB-ADMIN</span>
+          <span class="acc-name">Noura (Ops)</span>
+          <span class="acc-email">noura.subadmin@...</span>
+        </div>
+
+        <div class="acc-card" onclick="quickFill('aisha.designer@mallofabayas.com', 'Designer@MOA2026')">
+          <span class="acc-role role-designer">DESIGNER</span>
+          <span class="acc-name">Aisha (Senior)</span>
+          <span class="acc-email">aisha.designer@...</span>
+        </div>
+
+        <div class="acc-card" onclick="quickFill('mariam.consultant@mallofabayas.com', 'Tailor@MOA2026')">
+          <span class="acc-role role-designer">TAILOR</span>
+          <span class="acc-name">Mariam (Consultant)</span>
+          <span class="acc-email">mariam.consultant@...</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="login-footer">
+      &copy; 2026 Mall of Abayas (MOA) Atelier. All rights reserved.
+    </div>
+  </div>
+
+  <script>
+    // If already authenticated with valid token, redirect to dashboard
+    (async function checkExistingAuth() {
+      const token = localStorage.getItem('moa_crm_token');
+      if (token) {
+        try {
+          const res = await fetch('/api/auth/me', {
+            headers: { 'Authorization': 'Bearer ' + token }
+          });
+          const data = await res.json();
+          if (data.success && data.user) {
+            window.location.href = '/';
+          }
+        } catch (e) {}
+      }
+    })();
+
+    function togglePassword() {
+      const field = document.getElementById('input-password');
+      if (field.type === 'password') {
+        field.type = 'text';
+      } else {
+        field.type = 'password';
+      }
+    }
+
+    function quickFill(email, password) {
+      document.getElementById('input-email').value = email;
+      document.getElementById('input-password').value = password;
+      document.getElementById('btn-submit').click();
+    }
+
+    async function handleFormSubmit(e) {
+      e.preventDefault();
+      const email = document.getElementById('input-email').value.trim();
+      const password = document.getElementById('input-password').value;
+      const alertBox = document.getElementById('error-alert');
+      const submitBtn = document.getElementById('btn-submit');
+
+      alertBox.style.display = 'none';
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span>Verifying credentials...</span>';
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await res.json();
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<span>Sign In</span> &rarr;';
+
+        if (data.success && data.token) {
+          localStorage.setItem('moa_crm_token', data.token);
+          localStorage.setItem('moa_user_data', JSON.stringify(data.user));
+          window.location.href = '/';
+        } else {
+          alertBox.style.display = 'block';
+          alertBox.innerText = data.error || 'Invalid email or password.';
+        }
+      } catch (err) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<span>Sign In</span> &rarr;';
+        alertBox.style.display = 'block';
+        alertBox.innerText = 'Unable to connect to server. Please try again.';
+      }
+    }
+  </script>
+</body>
+</html>

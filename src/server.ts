@@ -37,6 +37,11 @@ app.use('/api/routing', routingRouter);
 // Shopify Webhook endpoint
 app.post('/webhooks/shopify/orders/create', handleShopifyOrderCreateWebhook);
 
+// Dedicated Login Page Route
+app.get('/login', (req, res) => {
+  res.sendFile(path.join(publicDir, 'login.html'));
+});
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({
