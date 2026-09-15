@@ -261,13 +261,25 @@ export class MOAAIConversationEngine {
     const hasHeight = !!extracted.height_cm;
     const hasBust = !!extracted.bust_inches;
 
+    // Detect specific alteration inquiries in text
+    let addonAck = '';
+    if (text.includes('feeding') || text.includes('zip') || text.includes('maternity')) {
+      addonAck = 'Yes, certainly! We can add concealed front maternity/feeding zippers for you complimentary. ';
+      if (!extracted.custom_requests) extracted.custom_requests = [];
+      if (!extracted.custom_requests.includes('Feeding Zip')) extracted.custom_requests.push('Feeding Zip');
+    } else if (text.includes('pocket')) {
+      addonAck = 'Yes, certainly! We can add two deep concealed side pockets to the drape. ';
+      if (!extracted.custom_requests) extracted.custom_requests = [];
+      if (!extracted.custom_requests.includes('Hidden Side Pockets')) extracted.custom_requests.push('Hidden Side Pockets');
+    }
+
     if (hasHeight && hasBust) {
       const fitLabel = extracted.fit_preference ? extracted.fit_preference.replace('_', ' ').toUpperCase() : 'REGULAR';
       const lenAdj = extracted.length_adjustment_inches ? `${extracted.length_adjustment_inches > 0 ? '+' : ''}${extracted.length_adjustment_inches}"` : 'Standard Length';
       const sleeveAdj = extracted.sleeve_adjustment_inches ? `${extracted.sleeve_adjustment_inches > 0 ? '+' : ''}${extracted.sleeve_adjustment_inches}"` : (extracted.sleeve_style || 'Standard');
 
       return {
-        replyMessage: `I have noted all your measurements for **${productTitle}**! Based on your height (${extracted.height_cm} cm), our standard reference size is **Size ${recommendation.standard_size}** with your custom preferences. Please review the summary below and confirm to proceed.`,
+        replyMessage: `${addonAck}I've updated your bespoke tailoring specifications for **${productTitle}**. Based on your height (${extracted.height_cm} cm), your baseline is **Size ${recommendation.standard_size}** with ${fitLabel} drape. Please review the summary card below and tap confirm when you are ready.`,
         updatedState: 'AI_HANDLING',
         customisationStatus: 'READY_FOR_VERIFICATION',
         updatedRecord: extracted,
@@ -279,15 +291,16 @@ export class MOAAIConversationEngine {
           fit: fitLabel,
           lengthAdjustment: lenAdj,
           sleeveAdjustment: sleeveAdj,
-          specialNotes: extracted.sleeve_style || (extracted.custom_requests ? extracted.custom_requests.join(', ') : 'None')
-        },
+          specialNotes: extracted.sleeve_style || (extracted.custom_requests ? extracted.custom_requests.join(', ') : 'None'),
+          addOns: extracted.custom_requests || []
+        } as any,
         escalationTriggered: false
       };
     }
 
     if (!hasHeight && !hasBust) {
       return {
-        replyMessage: `Of course! I'll be delighted to customise this piece for you. To begin, could you please share your **height** (in cm or ft/inches) and your usual **bust measurement**?`,
+        replyMessage: `${addonAck}Salam! Welcome to Mall of Abayas. I'm here to help tailor your **${productTitle}** with your perfect bespoke fit. To begin, could you please share your **height** (in cm or ft/in) and your usual **bust measurement** or fit preference?`,
         updatedState: 'AI_HANDLING',
         customisationStatus: 'GATHERING',
         updatedRecord: extracted,
@@ -298,7 +311,7 @@ export class MOAAIConversationEngine {
 
     if (!hasHeight) {
       return {
-        replyMessage: `Got it! I have noted your bust measurement (${extracted.bust_inches}"). What is your **height**, so I can match the perfect length and proportion for you?`,
+        replyMessage: `${addonAck}Got it! I have noted your bust measurement (${extracted.bust_inches}"). What is your **height**, so I can match the perfect length and proportion for you?`,
         updatedState: 'AI_HANDLING',
         customisationStatus: 'GATHERING',
         updatedRecord: extracted,
@@ -308,7 +321,7 @@ export class MOAAIConversationEngine {
     }
 
     return {
-      replyMessage: `Thank you! At ${extracted.height_cm} cm, your standard size reference is **Size ${recommendation.standard_size}**. What is your **bust measurement** (in inches or cm), and do you prefer a regular or extra loose modest fit?`,
+      replyMessage: `${addonAck}Thank you! At ${extracted.height_cm} cm, your standard size reference is **Size ${recommendation.standard_size}**. What is your **bust measurement** (in inches or cm), and do you prefer a regular or extra loose modest fit?`,
       updatedState: 'AI_HANDLING',
       customisationStatus: 'GATHERING',
       updatedRecord: extracted,
