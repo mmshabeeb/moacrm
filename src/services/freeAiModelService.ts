@@ -34,7 +34,7 @@ export class FreeAiModelService {
 
   constructor() {
     this.provider = process.env.AI_PROVIDER || 'gemini';
-    this.modelName = process.env.AI_MODEL_NAME || 'gemini-1.5-flash';
+    this.modelName = process.env.AI_MODEL_NAME || 'gemini-3.6-flash';
 
     const geminiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
     if (geminiKey) {
@@ -140,20 +140,19 @@ Return ONLY a valid JSON object matching this schema:
     const geminiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
 
     if (geminiKey) {
-      try {
-        const client = this.geminiClient || new GoogleGenerativeAI(geminiKey);
-        const model = client.getGenerativeModel({
-          model: this.modelName || 'gemini-1.5-flash',
-          generationConfig: {
-            responseMimeType: 'application/json',
-            temperature: 0.15
-          }
-        });
+      const client = this.geminiClient || new GoogleGenerativeAI(geminiKey);
+      const candidateModels = [
+        this.modelName,
+        'gemini-3.6-flash',
+        'gemini-flash-latest',
+        'gemini-3.5-flash',
+        'gemini-2.5-flash-lite'
+      ].filter(Boolean);
 
-        const systemPrompt = this.getTrainedSystemPrompt(input.productTitle, input.productCategory);
-        const historyText = input.chatHistory.map(m => `${m.sender.toUpperCase()}: ${m.text}`).join('\n');
-        
-        const prompt = `
+      const systemPrompt = this.getTrainedSystemPrompt(input.productTitle, input.productCategory);
+      const historyText = input.chatHistory.map(m => `${m.sender.toUpperCase()}: ${m.text}`).join('\n');
+      
+      const prompt = `
 ${systemPrompt}
 
 Current Session Measurements Recorded So Far:
@@ -166,28 +165,39 @@ Latest Customer Message:
 USER: ${input.userMessage}
 `;
 
-        const result = await model.generateContent(prompt);
-        const responseText = result.response.text();
-        
-        if (responseText) {
-          const parsed = JSON.parse(responseText);
-          return {
-            replyMessage: parsed.replyMessage || "I've updated your bespoke measurements.",
-            extractedHeightCm: parsed.extractedHeightCm || undefined,
-            extractedBustInches: parsed.extractedBustInches || undefined,
-            fitPreference: parsed.fitPreference || undefined,
-            lengthAdjustmentInches: parsed.lengthAdjustmentInches || undefined,
-            sleeveAdjustmentInches: parsed.sleeveAdjustmentInches || undefined,
-            sleeveStyle: parsed.sleeveStyle || undefined,
-            customRequests: parsed.customRequests || [],
-            recommendedSize: parsed.recommendedSize || undefined,
-            isComplete: !!parsed.isComplete,
-            requiresEscalation: !!parsed.requiresEscalation,
-            escalationReason: parsed.escalationReason || undefined
-          };
+      for (const candidate of candidateModels) {
+        try {
+          const model = client.getGenerativeModel({
+            model: candidate,
+            generationConfig: {
+              responseMimeType: 'application/json',
+              temperature: 0.2
+            }
+          });
+
+          const result = await model.generateContent(prompt);
+          const responseText = result.response.text();
+          
+          if (responseText) {
+            const parsed = JSON.parse(responseText);
+            return {
+              replyMessage: parsed.replyMessage || "I've updated your bespoke measurements.",
+              extractedHeightCm: parsed.extractedHeightCm || undefined,
+              extractedBustInches: parsed.extractedBustInches || undefined,
+              fitPreference: parsed.fitPreference || undefined,
+              lengthAdjustmentInches: parsed.lengthAdjustmentInches || undefined,
+              sleeveAdjustmentInches: parsed.sleeveAdjustmentInches || undefined,
+              sleeveStyle: parsed.sleeveStyle || undefined,
+              customRequests: parsed.customRequests || [],
+              recommendedSize: parsed.recommendedSize || undefined,
+              isComplete: !!parsed.isComplete,
+              requiresEscalation: !!parsed.requiresEscalation,
+              escalationReason: parsed.escalationReason || undefined
+            };
+          }
+        } catch (err: any) {
+          console.warn(`Gemini model ${candidate} failed: ${err.message}, trying next candidate...`);
         }
-      } catch (err) {
-        console.warn('Gemini API turn error, falling back to deterministic engine:', err);
       }
     }
 
