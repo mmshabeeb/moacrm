@@ -9,7 +9,11 @@
 <div class="moa-customisation-container" id="moa-customisation-root" 
      data-product-id="{{ product.id }}" 
      data-product-title="{{ product.title | escape }}" 
-     data-product-category="{{ product.metafields.moa.category | default: 'abaya_standard' }}">
+     data-product-category="{{ product.metafields.moa.category | default: 'abaya_standard' }}"
+     data-customer-id="{{ customer.id | default: '' }}"
+     data-customer-name="{{ customer.name | default: '' }}"
+     data-customer-email="{{ customer.email | default: '' }}"
+     data-customer-phone="{{ customer.phone | default: '' }}">
   
   <!-- 1. The PDP Opt-In Toggle Box -->
   <div class="moa-toggle-wrapper" onclick="if(event.target.tagName!=='INPUT'){const cb=document.getElementById('moa-customise-checkbox'); if(cb){cb.checked=!cb.checked; window.MOA_WIDGET && window.MOA_WIDGET.setCustomisationActive(cb.checked);}}">

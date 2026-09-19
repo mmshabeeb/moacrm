@@ -18,12 +18,62 @@ const activeSessions = new Map<string, {
 }>();
 
 /**
+ * POST /api/chat/customer-info
+ * Capture customer identity (Name, Mobile/WhatsApp, Email) on PDP customisation toggle
+ */
+chatRouter.post('/customer-info', (req: Request, res: Response) => {
+  try {
+    const { sessionToken, customerName, customerPhone, customerEmail, customerId, productTitle, productCategory } = req.body;
+    if (!sessionToken) {
+      return res.status(400).json({ error: 'Missing sessionToken' });
+    }
+
+    let session = activeSessions.get(sessionToken);
+    if (!session) {
+      session = {
+        record: {
+          id: `MOA-CUS-${Math.floor(100000 + Math.random() * 900000)}`,
+          product_title: productTitle || 'Mall of Abayas Product',
+          fit_preference: 'regular',
+          state: 'AI_HANDLING',
+          customisation_status: 'GATHERING',
+          customer_confirmed: false,
+          requires_extra_charge: false
+        },
+        history: [],
+        productTitle: productTitle || 'Mall of Abayas Product',
+        productCategory: productCategory || 'abaya_standard'
+      };
+      activeSessions.set(sessionToken, session);
+    }
+
+    if (customerName) session.record.customer_name = customerName;
+    if (customerPhone) session.record.customer_phone = customerPhone;
+    if (customerEmail) session.record.customer_email = customerEmail;
+    if (customerId) session.record.customer_id = customerId;
+
+    return res.json({
+      success: true,
+      customisationId: session.record.id,
+      customer: {
+        name: session.record.customer_name,
+        phone: session.record.customer_phone,
+        email: session.record.customer_email,
+        id: session.record.customer_id
+      }
+    });
+  } catch (err: any) {
+    return res.status(500).json({ error: 'Failed to update customer info' });
+  }
+});
+
+/**
  * POST /api/chat/message
  * Handles incoming conversational turns from the Shopify PDP
  */
 chatRouter.post('/message', async (req: Request, res: Response) => {
   try {
-    const { sessionToken, userMessage, productTitle, productCategory } = req.body;
+    const { sessionToken, userMessage, productTitle, productCategory, customerInfo, customerName, customerPhone, customerEmail, customerId } = req.body;
 
     if (!sessionToken || !userMessage) {
       return res.status(400).json({ error: 'Missing sessionToken or userMessage' });
@@ -47,6 +97,17 @@ chatRouter.post('/message', async (req: Request, res: Response) => {
       };
       activeSessions.set(sessionToken, session);
     }
+
+    // Attach customer identity
+    const cName = customerName || customerInfo?.name;
+    const cPhone = customerPhone || customerInfo?.phone;
+    const cEmail = customerEmail || customerInfo?.email;
+    const cId = customerId || customerInfo?.id;
+
+    if (cName) session.record.customer_name = cName;
+    if (cPhone) session.record.customer_phone = cPhone;
+    if (cEmail) session.record.customer_email = cEmail;
+    if (cId) session.record.customer_id = cId;
 
     // Add user message to history
     session.history.push({
@@ -112,7 +173,7 @@ chatRouter.post('/message', async (req: Request, res: Response) => {
  */
 chatRouter.post('/voice-message', async (req: Request, res: Response) => {
   try {
-    const { sessionToken, audioBase64, mimeType, productTitle, productCategory } = req.body;
+    const { sessionToken, audioBase64, mimeType, productTitle, productCategory, customerInfo, customerName, customerPhone, customerEmail, customerId } = req.body;
 
     if (!sessionToken || !audioBase64) {
       return res.status(400).json({ error: 'Missing sessionToken or audioBase64' });
@@ -136,6 +197,17 @@ chatRouter.post('/voice-message', async (req: Request, res: Response) => {
       };
       activeSessions.set(sessionToken, session);
     }
+
+    // Attach customer identity
+    const cName = customerName || customerInfo?.name;
+    const cPhone = customerPhone || customerInfo?.phone;
+    const cEmail = customerEmail || customerInfo?.email;
+    const cId = customerId || customerInfo?.id;
+
+    if (cName) session.record.customer_name = cName;
+    if (cPhone) session.record.customer_phone = cPhone;
+    if (cEmail) session.record.customer_email = cEmail;
+    if (cId) session.record.customer_id = cId;
 
     // Process Voice Note with Gemini Multimodal Audio
     const turnResult = await aiEngine.processVoiceTurn({
@@ -172,6 +244,10 @@ chatRouter.post('/voice-message', async (req: Request, res: Response) => {
     if (turnResult.escalationTriggered) {
       await crmAdapter.escalateToDesigner({
         session_id: session.record.id || sessionToken,
+        customer_name: session.record.customer_name,
+        customer_contact: session.record.customer_phone || session.record.customer_email,
+        customer_phone: session.record.customer_phone,
+        customer_email: session.record.customer_email,
         product_title: session.productTitle,
         current_recommended_size: session.record.recommended_size,
         measurements_summary: {
@@ -196,7 +272,7 @@ chatRouter.post('/voice-message', async (req: Request, res: Response) => {
       verificationSummary: turnResult.verificationSummary
     });
   } catch (error: any) {
-    console.error('Voice chat error:', error);
+    console.error('Voice turn error:', error);
     return res.status(500).json({ error: 'Failed to process voice note consultation' });
   }
 });
@@ -224,9 +300,13 @@ chatRouter.post('/confirm', async (req: Request, res: Response) => {
     return res.json({
       success: true,
       customisationId: session.record.id,
+      customerName: session.record.customer_name,
+      customerPhone: session.record.customer_phone,
       message: 'Customisation confirmed successfully. Add to cart unlocked.',
       lineItemProperties: {
         '_moa_customisation_id': session.record.id,
+        'Customisation Customer': session.record.customer_name || 'Guest',
+        'Customisation Phone': session.record.customer_phone || '',
         'Customisation Fit': session.record.fit_preference?.toUpperCase(),
         'Customisation Height': `${session.record.height_cm} cm`,
         'Customisation Bust': `${session.record.bust_inches}"`,
@@ -255,10 +335,22 @@ chatRouter.get('/sessions', (req: Request, res: Response) => {
       const isEscalated = record.state === 'HUMAN_DESIGNER_CONNECTED' || record.state === 'HUMAN_REVIEW_REQUIRED';
       const isClaimed = !!record.claimed_by_id;
 
+      const customerDisplayName = record.customer_name 
+        ? `${record.customer_name}` 
+        : `Customer (${session.productTitle ? session.productTitle.slice(0, 20) : 'Abaya Shopper'})`;
+
+      const cleanPhone = (record.customer_phone || '').replace(/[^\d+]/g, '');
+      const whatsappUrl = cleanPhone ? `https://wa.me/${cleanPhone.replace('+', '')}` : null;
+
       return {
         id: record.id || token,
         sessionToken: token,
-        name: `Customer (${session.productTitle ? session.productTitle.slice(0, 24) : 'Abaya Shopper'})`,
+        name: customerDisplayName,
+        customerName: record.customer_name || null,
+        customerPhone: record.customer_phone || null,
+        customerEmail: record.customer_email || null,
+        customerId: record.customer_id || null,
+        whatsappUrl: whatsappUrl,
         orderNumber: `#${record.id ? record.id.replace('MOA-CUS-', '') : 'PDP'}`,
         avatar: '👗',
         avatarColor: '#00a884',
@@ -280,7 +372,7 @@ chatRouter.get('/sessions', (req: Request, res: Response) => {
         messages: session.history.map(m => ({
           type: 'text',
           incoming: m.sender === 'user',
-          author: m.sender === 'user' ? 'Customer' : (m.sender === 'senior_designer' ? (record.claimed_by_name || 'Senior Designer') : 'MOA AI Designer'),
+          author: m.sender === 'user' ? (record.customer_name || 'Customer') : (m.sender === 'senior_designer' ? (record.claimed_by_name || 'Senior Designer') : 'MOA AI Designer'),
           text: m.text,
           time: m.timestamp ? new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) : 'Just now',
           ticks: m.sender === 'ai' ? '✓✓' : undefined

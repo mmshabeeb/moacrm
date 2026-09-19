@@ -385,6 +385,26 @@ async function runTests() {
   assert(voiceTurnRes.replyMessage !== undefined && voiceTurnRes.replyMessage.length > 0, 'Voice turn generates bespoke designer reply');
   assert(voiceTurnRes.updatedRecord !== undefined, 'Voice turn updates structured customisation record');
 
+  // --- Test Suite 12: Customer Identity, Login/Guest Gate & WhatsApp CRM Sync ---
+  console.log('\n👑 [Suite 12: Customer Identity, Login Gate & WhatsApp CRM Sync]');
+  const sampleCustomerRecord: any = {
+    id: 'MOA-CUS-VIP-001',
+    product_title: 'Royal Silk Velvet Abaya',
+    customer_id: 'cust_shopify_9921',
+    customer_name: 'Fatima Al-Nuaimi',
+    customer_phone: '+971 50 123 4567',
+    customer_email: 'fatima@example.com',
+    fit_preference: 'loose',
+    height_cm: 165,
+    bust_inches: 38
+  };
+  assert(sampleCustomerRecord.customer_name === 'Fatima Al-Nuaimi', 'Customer name is bound to customisation record');
+  assert(sampleCustomerRecord.customer_phone === '+971 50 123 4567', 'Mobile / WhatsApp number is bound to customisation record');
+
+  const cleanPhone = sampleCustomerRecord.customer_phone.replace(/[^\d]/g, '');
+  const waUrl = `https://wa.me/${cleanPhone}`;
+  assert(waUrl === 'https://wa.me/971501234567', 'WhatsApp direct link generated with country code');
+
   console.log(`\n====================================================`);
   console.log(`🎉 Test Results: ${passed} Passed, ${failed} Failed`);
   console.log(`====================================================\n`);

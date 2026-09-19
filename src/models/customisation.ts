@@ -56,6 +56,12 @@ export interface StructuredCustomisationRecord {
   requires_extra_charge: boolean;
   extra_charge_amount?: number;
   
+  // Customer Identity
+  customer_id?: string;
+  customer_name?: string;
+  customer_email?: string;
+  customer_phone?: string;
+
   // Verification & Staff Assignment
   customer_confirmed: boolean;
   confirmed_at?: string;
@@ -67,8 +73,11 @@ export interface StructuredCustomisationRecord {
 
 export interface EscalationDossier {
   session_id: string;
+  customer_id?: string;
   customer_name?: string;
   customer_contact?: string;
+  customer_email?: string;
+  customer_phone?: string;
   product_title: string;
   current_recommended_size?: number;
   measurements_summary: {

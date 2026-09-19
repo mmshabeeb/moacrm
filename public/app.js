@@ -925,6 +925,23 @@ function loadAISessionDetail(sessionId) {
   const headerName = document.getElementById('ai-header-name');
   if (headerName) headerName.innerText = session.name;
 
+  const aiPhoneBadge = document.getElementById('ai-customer-phone-badge');
+  const aiWaLink = document.getElementById('ai-wa-direct-link');
+  if (session.customerPhone) {
+    if (aiPhoneBadge) {
+      aiPhoneBadge.innerText = `📱 ${session.customerPhone}`;
+      aiPhoneBadge.style.display = 'inline-block';
+    }
+    if (aiWaLink) {
+      const clean = session.customerPhone.replace(/[^\d]/g, '');
+      aiWaLink.href = `https://wa.me/${clean}`;
+      aiWaLink.style.display = 'inline-flex';
+    }
+  } else {
+    if (aiPhoneBadge) aiPhoneBadge.style.display = 'none';
+    if (aiWaLink) aiWaLink.style.display = 'none';
+  }
+
   // Render AI Messages Thread
   renderAIMessagesThread(session);
 }
@@ -1035,6 +1052,30 @@ function loadSessionDetail(sessionId) {
 
   const headerName = document.getElementById('wa-header-name');
   if (headerName) headerName.innerText = session.name;
+
+  const phoneBadge = document.getElementById('wa-customer-phone-badge');
+  const waDirectBtn = document.getElementById('btn-wa-direct-link');
+  const callDirectBtn = document.getElementById('btn-call-direct-link');
+
+  if (session.customerPhone) {
+    if (phoneBadge) {
+      phoneBadge.innerText = `📱 ${session.customerPhone}`;
+      phoneBadge.style.display = 'inline-block';
+    }
+    if (waDirectBtn) {
+      const clean = session.customerPhone.replace(/[^\d]/g, '');
+      waDirectBtn.href = `https://wa.me/${clean}`;
+      waDirectBtn.style.display = 'inline-flex';
+    }
+    if (callDirectBtn) {
+      callDirectBtn.href = `tel:${session.customerPhone}`;
+      callDirectBtn.style.display = 'inline-flex';
+    }
+  } else {
+    if (phoneBadge) phoneBadge.style.display = 'none';
+    if (waDirectBtn) waDirectBtn.style.display = 'none';
+    if (callDirectBtn) callDirectBtn.style.display = 'none';
+  }
 
   const headerStatus = document.getElementById('wa-status-text');
   if (headerStatus) {
