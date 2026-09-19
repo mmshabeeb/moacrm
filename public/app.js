@@ -77,22 +77,8 @@ async function fetchLiveStorefrontSessions() {
   }
 }
 
-function initConsultations() {
-  renderContactsList();
-  if (activeSessionId && consultationSessions[activeSessionId]) {
-    loadSessionDetail(activeSessionId);
-  }
-}
-
-function initAIChats() {
-  renderAIContactsList();
-  if (activeAISessionId && consultationSessions[activeAISessionId]) {
-    loadAISessionDetail(activeAISessionId);
-  }
-  // Start auto-syncing storefront sessions every 2.5 seconds
-  fetchLiveStorefrontSessions();
-  setInterval(fetchLiveStorefrontSessions, 2500);
-}
+// Start auto-syncing storefront sessions periodically
+setInterval(fetchLiveStorefrontSessions, 2500);
 
 // =======================================================
 // INITIALIZATION & AUTHENTICATION

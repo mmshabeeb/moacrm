@@ -117,19 +117,19 @@
         <button class="moa-nav-btn active" data-tab="tab-consultations" id="nav-btn-consultations">
           <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
           <span>Live Consultations</span>
-          <span class="moa-count-badge" id="badge-escalations">2</span>
+          <span class="moa-count-badge" id="badge-escalations">0</span>
         </button>
 
         <button class="moa-nav-btn" data-tab="tab-ai-chats" id="nav-btn-ai-chats">
           <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
           <span>AI Chats</span>
-          <span class="moa-count-badge" id="badge-ai-chats" style="background:#00a884; color:#fff;">1</span>
+          <span class="moa-count-badge" id="badge-ai-chats" style="background:#00a884; color:#fff;">0</span>
         </button>
         
         <button class="moa-nav-btn" data-tab="tab-production" id="nav-btn-production">
           <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
           <span>Production Orders</span>
-          <span class="moa-count-badge" id="badge-production">1</span>
+          <span class="moa-count-badge" id="badge-production">0</span>
         </button>
         
         <button class="moa-nav-btn" data-tab="tab-addons" id="nav-btn-addons">
@@ -175,22 +175,22 @@
         <!-- Top Dossier Bar (Collapsible / Summary) -->
         <div class="moa-dossier-bar">
           <div class="moa-dossier-summary-left">
-            <div class="moa-dossier-badge" id="dossier-customisation-id">MOA-CUS-10482</div>
+            <div class="moa-dossier-badge" id="dossier-customisation-id">NO ACTIVE CHAT</div>
             <div>
               <h3 style="font-size: 1.05rem; margin-bottom: 2px;">
-                <span id="dossier-customer-name">Sarah Al-Mansoor</span> 
-                <small style="color: #8b5a2b;" id="dossier-order-badge">(#10482)</small>
+                <span id="dossier-customer-name">Waiting for customer...</span> 
+                <small style="color: #8b5a2b;" id="dossier-order-badge"></small>
               </h3>
               <span style="font-size: 0.82rem; color: #666;">
-                Product: <strong id="dossier-product-title">Linen Grace – Mom's Modest Set</strong> • Base Size: <strong id="dossier-base-size">56</strong>
+                Product: <strong id="dossier-product-title">No consultation selected</strong> • Base Size: <strong id="dossier-base-size">—</strong>
               </span>
             </div>
           </div>
           <div class="moa-dossier-metrics" onclick="openEditCustomisationModal()" title="Click to edit customisation measurements & specs" style="cursor: pointer;">
-            <div class="metric-chip"><span>Height:</span> <strong id="dossier-metric-height">165 cm</strong></div>
-            <div class="metric-chip"><span>Bust:</span> <strong id="dossier-metric-bust">38"</strong></div>
-            <div class="metric-chip"><span>Fit:</span> <strong style="color:#8b5a2b;" id="dossier-metric-fit">Extra Loose</strong></div>
-            <div class="metric-chip"><span>Sleeve:</span> <strong id="dossier-metric-sleeve">+2" (Loose)</strong></div>
+            <div class="metric-chip"><span>Height:</span> <strong id="dossier-metric-height">—</strong></div>
+            <div class="metric-chip"><span>Bust:</span> <strong id="dossier-metric-bust">—</strong></div>
+            <div class="metric-chip"><span>Fit:</span> <strong style="color:#8b5a2b;" id="dossier-metric-fit">—</strong></div>
+            <div class="metric-chip"><span>Sleeve:</span> <strong id="dossier-metric-sleeve">—</strong></div>
           </div>
           <div class="moa-dossier-actions">
             <button class="moa-btn moa-btn-secondary" id="btn-edit-customisation" onclick="openEditCustomisationModal()" title="Edit customisation specs and measurements">✏️ Edit Specs</button>
@@ -215,7 +215,7 @@
             <div class="wa-category-tabs">
               <button class="wa-tab-chip active" id="chip-tab-unassigned" onclick="switchChatCategory('UNASSIGNED')" title="Escalated unassigned queue - open and take over to text">
                 <span>⏳ Unassigned</span>
-                <span class="chip-count chip-alert" id="count-unassigned">2</span>
+                <span class="chip-count chip-alert" id="count-unassigned">0</span>
               </button>
               <button class="wa-tab-chip" id="chip-tab-my" onclick="switchChatCategory('MY_CHATS')" title="Consultations you have taken over">
                 <span>💬 My Chats</span>
@@ -223,7 +223,7 @@
               </button>
               <button class="wa-tab-chip" id="chip-tab-all" onclick="switchChatCategory('ALL_STAFF')" title="Supervisory view of all staff consultations">
                 <span>🌐 All</span>
-                <span class="chip-count" id="count-all">3</span>
+                <span class="chip-count" id="count-all">0</span>
               </button>
             </div>
 
@@ -238,13 +238,13 @@
             <!-- Header -->
             <div class="wa-chat-header">
               <div class="wa-header-contact">
-                <div class="wa-avatar-img" id="wa-header-avatar" style="background:#00a884;">S</div>
+                <div class="wa-avatar-img" id="wa-header-avatar" style="background:#00a884;">—</div>
                 <div class="wa-contact-details">
                   <div style="display:flex; align-items:center; gap:8px;">
-                    <span class="wa-contact-name" id="wa-header-name">Sarah Al-Mansoor</span>
+                    <span class="wa-contact-name" id="wa-header-name">No Consultation Selected</span>
                     <span id="wa-customer-phone-badge" style="font-size:0.75rem; background:#f0fdf4; color:#166534; padding:2px 7px; border-radius:10px; font-weight:600; display:none;"></span>
                   </div>
-                  <span class="wa-contact-status" id="wa-status-text">online • consultation in progress</span>
+                  <span class="wa-contact-status" id="wa-status-text">Select a chat from the left panel</span>
                 </div>
               </div>
               <div class="wa-header-icons">
@@ -394,23 +394,23 @@
         <!-- Top Dossier Bar for AI Live Monitoring -->
         <div class="moa-dossier-bar">
           <div class="moa-dossier-summary-left">
-            <div class="moa-dossier-badge" style="background:#e0f2fe; color:#0369a1;" id="ai-dossier-id">MOA-CUS-10250</div>
+            <div class="moa-dossier-badge" style="background:#e0f2fe; color:#0369a1;" id="ai-dossier-id">NO ACTIVE AI SESSION</div>
             <div>
               <h3 style="font-size: 1.05rem; margin-bottom: 2px;">
-                <span id="ai-dossier-customer">Huda (Riyadh)</span> 
-                <small style="color: #0284c7;" id="ai-dossier-order">(#10250)</small>
+                <span id="ai-dossier-customer">Waiting for storefront shopper...</span> 
+                <small style="color: #0284c7;" id="ai-dossier-order"></small>
                 <span style="font-size:0.75rem; background:#dcfce7; color:#15803d; padding:2px 7px; border-radius:12px; margin-left:6px; font-weight:600;">🤖 AI Active</span>
               </h3>
               <span style="font-size: 0.82rem; color: #666;">
-                Product: <strong id="ai-dossier-product">Classic Nidha Butterfly Abaya</strong> • Base Size: <strong id="ai-dossier-size">54</strong>
+                Product: <strong id="ai-dossier-product">No AI consultation active</strong> • Base Size: <strong id="ai-dossier-size">—</strong>
               </span>
             </div>
           </div>
           <div class="moa-dossier-metrics">
-            <div class="metric-chip"><span>Height:</span> <strong id="ai-metric-height">158 cm</strong></div>
-            <div class="metric-chip"><span>Bust:</span> <strong id="ai-metric-bust">34"</strong></div>
-            <div class="metric-chip"><span>Fit:</span> <strong style="color:#0369a1;" id="ai-metric-fit">Regular Flared</strong></div>
-            <div class="metric-chip"><span>Sleeve:</span> <strong id="ai-metric-sleeve">Standard (27")</strong></div>
+            <div class="metric-chip"><span>Height:</span> <strong id="ai-metric-height">—</strong></div>
+            <div class="metric-chip"><span>Bust:</span> <strong id="ai-metric-bust">—</strong></div>
+            <div class="metric-chip"><span>Fit:</span> <strong style="color:#0369a1;" id="ai-metric-fit">—</strong></div>
+            <div class="metric-chip"><span>Sleeve:</span> <strong id="ai-metric-sleeve">—</strong></div>
           </div>
           <div class="moa-dossier-actions">
             <button class="moa-btn moa-btn-takeover" onclick="handleTakeoverAIChat()">⚡ Intervene & Take Over Chat</button>
@@ -426,7 +426,7 @@
                 <span style="font-size:1.2rem;">🤖</span>
                 <span style="font-size:0.9rem; font-weight:700; color:#111b21;">Storefront AI Sessions</span>
               </div>
-              <span class="chip-count" style="background:#00a884; color:#fff;" id="ai-panel-count">1</span>
+              <span class="chip-count" style="background:#00a884; color:#fff;" id="ai-panel-count">0</span>
             </div>
 
             <div class="wa-search-bar">
@@ -445,13 +445,13 @@
           <div class="wa-conversation-panel">
             <div class="wa-chat-header">
               <div class="wa-header-contact">
-                <div class="wa-avatar-img" id="ai-header-avatar" style="background:#d97706;">H</div>
+                <div class="wa-avatar-img" id="ai-header-avatar" style="background:#d97706;">—</div>
                 <div class="wa-contact-details">
                   <div style="display:flex; align-items:center; gap:8px;">
-                    <span class="wa-contact-name" id="ai-header-name">Huda (Riyadh)</span>
+                    <span class="wa-contact-name" id="ai-header-name">No AI Chat Selected</span>
                     <span id="ai-customer-phone-badge" style="font-size:0.75rem; background:#f0fdf4; color:#166534; padding:2px 7px; border-radius:10px; font-weight:600; display:none;"></span>
                   </div>
-                  <span class="wa-contact-status" id="ai-header-status" style="color:#00a884;">online • chatting with AI Designer on PDP</span>
+                  <span class="wa-contact-status" id="ai-header-status" style="color:#00a884;">Live storefront AI stream</span>
                 </div>
               </div>
               <div class="wa-header-icons">
@@ -754,7 +754,7 @@
       </div>
       <div style="padding: 1rem 1.5rem;">
         <p style="font-size: 0.88rem; color: #555; margin-bottom: 1.25rem;">
-          Transfer customer <strong id="transfer-modal-cust-name">Sarah Al-Mansoor</strong> (<span id="transfer-modal-id">MOA-CUS-10482</span>) to another designer, an administrator, or return to the Unassigned queue.
+          Transfer customer <strong id="transfer-modal-cust-name">—</strong> (<span id="transfer-modal-id">—</span>) to another designer, an administrator, or return to the Unassigned queue.
         </p>
 
         <div class="moa-form-group">
@@ -784,7 +784,7 @@
           <span style="font-size: 1.3rem;">✏️</span>
           <div>
             <h3 style="margin: 0; font-size: 1.05rem;">Edit Customer Customisation</h3>
-            <span style="font-size: 0.78rem; color: #666;" id="edit-modal-subtitle">Sarah Al-Mansoor • MOA-CUS-10482</span>
+            <span style="font-size: 0.78rem; color: #666;" id="edit-modal-subtitle">—</span>
           </div>
         </div>
         <button class="moa-close-modal" onclick="closeEditCustomisationModal()">&times;</button>
@@ -796,9 +796,9 @@
         <div style="background: #faf8f5; border: 1px solid #e7ded5; border-radius: 8px; padding: 10px 14px; margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center;">
           <div>
             <span style="font-size: 0.75rem; color: #888; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Product Item</span>
-            <div style="font-weight: 600; font-size: 0.88rem; color: #222;" id="edit-modal-product-title">Linen Grace – Mom's Modest Set</div>
+            <div style="font-weight: 600; font-size: 0.88rem; color: #222;" id="edit-modal-product-title">—</div>
           </div>
-          <div class="moa-dossier-badge" id="edit-modal-badge" style="font-size: 0.78rem;">MOA-CUS-10482</div>
+          <div class="moa-dossier-badge" id="edit-modal-badge" style="font-size: 0.78rem;">—</div>
         </div>
 
         <!-- 2-Column Grid for Core Sizing & Tailoring Specs -->
@@ -886,6 +886,6 @@
     </div>
   </div>
 
-  <script src="/app.js?v=2.5.0"></script>
+  <script src="/app.js?v=2.6.0"></script>
 </body>
 </html>
