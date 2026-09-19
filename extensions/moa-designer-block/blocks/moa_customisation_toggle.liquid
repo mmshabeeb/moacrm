@@ -5,7 +5,8 @@
 
 {{ 'moa_widget.css' | asset_url | stylesheet_tag }}
 
-{% if product.metafields.moa.customisation_enabled != false %}
+{%- assign customisation_disabled = product.metafields.moa.customisation_enabled -%}
+{%- if customisation_disabled != false -%}
 <div class="moa-customisation-container" id="moa-customisation-root" 
      data-product-id="{{ product.id }}" 
      data-product-title="{{ product.title | escape }}" 
@@ -22,7 +23,7 @@
       <span class="moa-checkbox-text">
         <span class="moa-checkbox-title">
           <span>{{ block.settings.toggle_title | default: 'Need Customisations?' }}</span>
-          {% if block.settings.show_free_badge != false %}
+          {% if block.settings.show_free_badge %}
             <span class="moa-badge-free">Complimentary Service</span>
           {% endif %}
         </span>
@@ -75,7 +76,6 @@
       <button type="button" class="moa-quick-chip" onclick="window.MOA_WIDGET && window.MOA_WIDGET.sendQuickText('3-inch heels for wedding')">👠 3-inch Heels</button>
     </div>
 
-
     <!-- Bottom Input Bar -->
     <form id="moa-chat-form" class="moa-wa-input-toolbar">
       <button type="button" class="moa-wa-icon-btn" title="Emojis" onclick="window.MOA_WIDGET && window.MOA_WIDGET.insertQuickEmoji('✨')">✨</button>
@@ -124,6 +124,7 @@
 </div>
 
 <script src="{{ 'moa_widget.js' | asset_url }}" defer="defer"></script>
+{%- endif -%}
 
 {% schema %}
 {
@@ -165,4 +166,3 @@
   ]
 }
 {% endschema %}
-{% endif %}
