@@ -72,8 +72,8 @@ export class MOADesignerRoutingEngine {
       role: 'SENIOR_DESIGNER',
       status: 'AVAILABLE',
       maxConcurrentChats: 5,
-      activeChatCount: 1,
-      assignedSessionIds: ['MOA-CUS-10482'],
+      activeChatCount: 0,
+      assignedSessionIds: [],
       skills: ['bespoke_tailoring', 'luxury_embroidery'],
       languages: ['ar', 'en'],
       lastHeartbeat: new Date().toISOString()

@@ -62,6 +62,8 @@
       this.idleTimeout = null;
       this.nudgeCount = 0;
       this.unreadCount = 0;
+      this.renderedHistoryCount = 0;
+      this.syncPollInterval = null;
 
       this.initElements();
       this.bindEvents();
@@ -77,6 +79,7 @@
       this.form = document.getElementById('moa-chat-form');
       this.input = document.getElementById('moa-user-input');
       this.minimizeBtn = document.getElementById('moa-minimize-chat');
+      this.resetBtn = document.getElementById('moa-reset-chat');
       this.micBtn = document.getElementById('moa-mic-btn');
       this.recordingBar = document.getElementById('moa-recording-bar');
       this.recTimer = document.getElementById('moa-rec-timer');
@@ -122,6 +125,13 @@
         });
       }
 
+      if (this.resetBtn) {
+        this.resetBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.handleResetChat();
+        });
+      }
+
       if (this.form) {
         this.form.addEventListener('submit', (e) => {
           e.preventDefault();
@@ -159,6 +169,76 @@
           this.sendVoiceRecording();
         });
       }
+    }
+
+    startLiveSyncPolling() {
+      if (this.syncPollInterval) return;
+      this.syncPollInterval = setInterval(async () => {
+        if (!this.isCustomising) return;
+        try {
+          const res = await fetch(`${this.apiBase}/api/chat/sync/${this.sessionToken}`);
+          const data = await res.json();
+          if (data.success && Array.isArray(data.history)) {
+            if (data.history.length > this.renderedHistoryCount) {
+              const newMessages = data.history.slice(this.renderedHistoryCount);
+              newMessages.forEach(msg => {
+                if (msg.sender === 'senior_designer') {
+                  this.appendMessage({
+                    incoming: true,
+                    author: data.claimedByName || 'Senior Atelier Designer',
+                    text: msg.text,
+                    time: msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) : this.formatCurrentTime()
+                  });
+                }
+              });
+              this.renderedHistoryCount = data.history.length;
+            }
+          }
+        } catch (e) {}
+      }, 2500);
+    }
+
+    stopLiveSyncPolling() {
+      if (this.syncPollInterval) {
+        clearInterval(this.syncPollInterval);
+        this.syncPollInterval = null;
+      }
+    }
+
+    async handleResetChat() {
+      if (!confirm('Start a fresh consultation for this abaya?')) return;
+      this.sessionToken = `MOA-CUS-${Math.floor(100000 + Math.random() * 900000)}`;
+      localStorage.setItem(this.sessionKey, this.sessionToken);
+      this.renderedHistoryCount = 0;
+      this.isConfirmed = false;
+      this.userHasTexted = false;
+
+      if (this.messagesContainer) {
+        this.messagesContainer.innerHTML = `
+          <div class="moa-wa-bubble moa-wa-incoming">
+            <span class="moa-wa-author">MOA Designer</span>
+            <p style="margin:0;">Salam! I'm your MOA Customisation Designer. Tell me your height, preferred fit, or any alteration in your own words!</p>
+            <div class="moa-wa-meta"><span>Just now</span></div>
+          </div>
+        `;
+      }
+
+      this.updateCartButtonState(true);
+
+      try {
+        await fetch(`${this.apiBase}/api/chat/reset`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sessionToken: this.sessionToken,
+            productTitle: this.productTitle,
+            productCategory: this.productCategory
+          })
+        });
+        if (this.customerProfile.name) {
+          await this.syncCustomerInfo();
+        }
+      } catch (e) {}
     }
 
     async syncCustomerInfo() {
@@ -266,6 +346,7 @@
         this.openPanel();
         this.renderCustomerIdentificationGate();
         this.updateCartButtonState(true);
+        this.startLiveSyncPolling();
 
         if (!this.userHasTexted && this.nudgeCount === 0) {
           this.startIdleNudgeTimer();
@@ -275,6 +356,7 @@
         this.closeAll();
         this.updateCartButtonState(false);
         this.clearIdleNudgeTimer();
+        this.stopLiveSyncPolling();
       }
     }
 

@@ -5,50 +5,8 @@ import { MOAProductionOrder, ProductionStatus } from '../models/production';
 export const productionRouter = Router();
 const sheetService = new ProductionSheetService();
 
-// Mock in-memory database for production orders
+// In-memory database for production orders
 export const productionOrdersDb = new Map<string, MOAProductionOrder>();
-
-// Seed a sample order for instant demo/verification
-const sampleOrder: MOAProductionOrder = {
-  customisation_id: 'MOA-CUS-000124',
-  shopify_order_id: 'gid://shopify/Order/5849382910',
-  shopify_order_number: '#10482',
-  customer_name: 'Sarah Al-Mansoor',
-  customer_email: 'sarah@example.com',
-  order_date: new Date().toISOString(),
-  product_id: 'prod_928174',
-  product_name: "Linen Grace – Mom's Modest Set",
-  product_category: 'modest_set',
-  base_size: 56,
-  color: 'Olive Mist',
-  measurements: {
-    height_cm: 165,
-    height_ft_display: "5'5\"",
-    bust_inches: 38,
-    waist_inches: 34,
-    garment_length_inches: 57
-  },
-  fit_preference: 'extra_loose',
-  alterations: {
-    length_adjustment_inches: 1,
-    sleeve_adjustment_inches: 2,
-    sleeve_style: 'Extra room around armholes & relaxed cuff',
-    has_pockets: true,
-    other_alterations: ['Added hidden side pocket on right seam']
-  },
-  customer_notes: 'I prefer a modest, relaxed fit and slightly longer sleeves.',
-  tailor_production_notes: 'Add 1" extra ease around armholes as requested by customer.',
-  status: 'IN_PRODUCTION',
-  current_version: 1,
-  revisions: [],
-  customer_confirmed: true,
-  customer_confirmed_at: new Date(Date.now() - 3600000).toISOString(),
-  designer_approved: true,
-  designer_approved_at: new Date().toISOString(),
-  designer_name: 'Senior Designer Fatima'
-};
-
-productionOrdersDb.set(sampleOrder.customisation_id, sampleOrder);
 
 /**
  * GET /api/production/orders

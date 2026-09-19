@@ -28,8 +28,8 @@ let currentAuth = {
 
 // Current Active Consultation Tab & Filter
 let currentChatCategory = 'UNASSIGNED'; // 'UNASSIGNED' | 'MY_CHATS' | 'ALL_STAFF'
-let activeSessionId = 'MOA-CUS-10482';
-let activeAISessionId = 'MOA-CUS-10250';
+let activeSessionId = null;
+let activeAISessionId = null;
 
 // Voice Recording State Machine
 let recordingState = 'IDLE'; // 'IDLE' | 'RECORDING' | 'PAUSED'
@@ -456,235 +456,138 @@ function switchTab(targetTabId) {
 // CONSULTATION SESSIONS DATA & UNASSIGNED FLOW
 // =======================================================
 
-const consultationSessions = {
-  'MOA-CUS-10495': {
-    id: 'MOA-CUS-10495',
-    name: 'Zara Al-Hashemi',
-    orderNumber: '#10495',
-    avatar: 'Z',
-    avatarColor: '#7c3aed',
-    product: 'Royal Silk Velvet Abaya – Emerald',
-    baseSize: '54',
-    height: '160 cm',
-    bust: '36"',
-    fit: 'Regular Flared',
-    sleeve: '+1.5" (Heels)',
-    status: 'online • waiting in unassigned queue',
-    time: '15:10',
-    preview: 'I will wear 3-inch heels, could you adjust length to 55.5 inches?',
-    unread: 2,
-    claimedBy: null,
-    claimedById: null,
-    claimedByRole: null,
-    isAIHandling: false,
-    messages: [
-      {
-        type: 'text',
-        incoming: true,
-        author: 'Zara Al-Hashemi',
-        text: "Salam! I'm ordering the Royal Silk Velvet Abaya for my sister's wedding. I need advice on length with heels.",
-        time: '15:05'
-      },
-      {
-        type: 'text',
-        incoming: false,
-        author: 'MOA AI Designer',
-        text: "Wa alaykum assalam Zara! For your height of 160 cm, standard size 54 finishes at 54 inches. With 3-inch heels, we recommend extending length by +1.5 inches to 55.5\".",
-        time: '15:07',
-        ticks: '✓✓'
-      },
-      {
-        type: 'text',
-        incoming: true,
-        author: 'Zara Al-Hashemi',
-        text: "That's perfect! Also can we add side pockets and a hidden feeding zipper?",
-        time: '15:08'
-      },
-      {
-        type: 'text',
-        incoming: false,
-        author: 'MOA AI Designer',
-        text: "Yes absolutely. Side seam pockets (+15 AED) and hidden maternity zipper (+25 AED) can be integrated seamlessly into the design.",
-        time: '15:09',
-        ticks: '✓✓'
-      },
-      {
-        type: 'text',
-        incoming: true,
-        author: 'Zara Al-Hashemi',
-        text: "I will wear 3-inch heels, could you adjust length to 55.5 inches and confirm the cuff width?",
-        time: '15:10'
-      },
-      {
-        type: 'system',
-        text: '⏳ Transferred by AI to Unassigned Queue for bespoke heel length & cuff verification'
-      }
-    ]
-  },
-  'MOA-CUS-10482': {
-    id: 'MOA-CUS-10482',
-    name: 'Sarah Al-Mansoor',
-    orderNumber: '#10482',
-    avatar: 'S',
-    avatarColor: '#00a884',
-    product: "Linen Grace – Mom's Modest Set",
-    baseSize: '56',
-    height: '165 cm',
-    bust: '38"',
-    fit: 'Extra Loose',
-    sleeve: '+2" (Loose)',
-    status: 'online • waiting in unassigned queue',
-    time: '14:52',
-    preview: 'Can you make the sleeves 2 inches longer with extra room around arms?',
-    unread: 1,
-    claimedBy: null,
-    claimedById: null,
-    claimedByRole: null,
-    isAIHandling: false,
-    messages: [
-      {
-        type: 'text',
-        incoming: true,
-        author: 'Sarah Al-Mansoor',
-        text: 'Hi! I want this Linen Grace Modest Set in an extra loose fit. My height is 165 cm, bust 38 inches, and can you make the sleeves 2 inches longer with extra room around arms?',
-        time: '14:50'
-      },
-      {
-        type: 'text',
-        incoming: false,
-        author: 'MOA AI Designer',
-        text: "Of course Sarah! At 165 cm, size 56 is your baseline reference. I've noted an extra loose drape with +2\" sleeve extension and extra armhole ease.",
-        time: '14:51',
-        ticks: '✓✓'
-      },
-      {
-        type: 'image',
-        incoming: true,
-        author: 'Sarah Al-Mansoor',
-        imgSrc: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=500&q=80',
-        text: 'Here is the sleeve cuff style I liked from your collection!',
-        time: '14:52'
-      },
-      {
-        type: 'audio',
-        incoming: true,
-        author: 'Sarah Al-Mansoor',
-        duration: '0:14',
-        time: '14:53'
-      },
-      {
-        type: 'system',
-        text: '⏳ Transferred by AI to Unassigned Queue for cuff style review'
-      }
-    ]
-  },
-  'MOA-CUS-10398': {
-    id: 'MOA-CUS-10398',
-    name: 'Maryam (Dubai)',
-    orderNumber: '#10398',
-    avatar: 'M',
-    avatarColor: '#5c6bc0',
-    product: 'Noor Pleated Bisht – Desert Pearl',
-    baseSize: '58',
-    height: '170 cm',
-    bust: '40"',
-    fit: 'Tailored Modest',
-    sleeve: 'Standard (28")',
-    status: 'online • live consultation',
-    time: '13:20',
-    preview: '✓✓ Customisation confirmed: Size 58',
-    unread: 0,
-    claimedBy: 'Aisha Designer',
-    claimedById: 'user_designer_1',
-    claimedByRole: 'SENIOR_DESIGNER',
-    isAIHandling: false,
-    messages: [
-      {
-        type: 'text',
-        incoming: true,
-        author: 'Maryam (Dubai)',
-        text: 'Hello, what size would you recommend for 170 cm height and 40 inches bust?',
-        time: '11:20'
-      },
-      {
-        type: 'text',
-        incoming: false,
-        author: 'MOA AI Designer',
-        text: 'Marhaba Maryam! Based on 170 cm and 40" bust, your recommended baseline is Size 58 for an elegant drape.',
-        time: '11:22',
-        ticks: '✓✓'
-      },
-      {
-        type: 'system',
-        text: '🔵 Aisha Designer took over the consultation'
-      },
-      {
-        type: 'text',
-        incoming: false,
-        author: 'Aisha Designer',
-        text: 'Salam Maryam! I am Aisha from the tailoring team. I reviewed your 170 cm height and pleated bisht drape—Size 58 will fit gorgeously.',
-        time: '11:24',
-        ticks: '✓✓'
-      },
-      {
-        type: 'text',
-        incoming: true,
-        author: 'Maryam (Dubai)',
-        text: 'Thank you Aisha! Can I confirm this customisation?',
-        time: '11:25'
-      }
-    ]
-  },
-  'MOA-CUS-10250': {
-    id: 'MOA-CUS-10250',
-    name: 'Huda (Riyadh)',
-    orderNumber: '#10250',
-    avatar: 'H',
-    avatarColor: '#d97706',
-    product: 'Classic Nidha Butterfly Abaya',
-    baseSize: '54',
-    height: '158 cm',
-    bust: '34"',
-    fit: 'Regular Flared',
-    sleeve: 'Standard (27")',
-    status: 'online • chatting with AI Designer on PDP',
-    time: '12:05',
-    preview: 'What is the chest measurement for size 54?',
-    unread: 0,
-    claimedBy: null,
-    claimedById: null,
-    claimedByRole: null,
-    isAIHandling: true,
-    messages: [
-      {
-        type: 'text',
-        incoming: true,
-        author: 'Huda (Riyadh)',
-        text: 'Salam, what is the chest circumference for size 54 in the Butterfly cut?',
-        time: '12:04'
-      },
-      {
-        type: 'text',
-        incoming: false,
-        author: 'MOA AI Designer',
-        text: 'Wa alaykum assalam Huda! For Size 54, the flat bust width is 22 inches (44 inches circumference) with extra butterfly flutter ease.',
-        time: '12:05',
-        ticks: '✓✓'
-      }
-    ]
-  }
-};
+let consultationSessions = {};
 
 function initConsultations() {
   updateCategoryCounts();
   renderContactsList();
-  loadSessionDetail(activeSessionId);
+  if (activeSessionId && consultationSessions[activeSessionId]) {
+    loadSessionDetail(activeSessionId);
+  } else {
+    const unassigned = getFilteredSessionIds();
+    if (unassigned.length > 0) {
+      loadSessionDetail(unassigned[0]);
+    } else {
+      renderEmptySessionDetail();
+    }
+  }
 }
 
 function initAIChats() {
   renderAIContactsList();
-  loadAISessionDetail(activeAISessionId);
+  if (activeAISessionId && consultationSessions[activeAISessionId]) {
+    loadAISessionDetail(activeAISessionId);
+  } else {
+    const aiIds = Object.keys(consultationSessions).filter(k => consultationSessions[k].isAIHandling);
+    if (aiIds.length > 0) {
+      loadAISessionDetail(aiIds[0]);
+    } else {
+      renderEmptyAISessionDetail();
+    }
+  }
 }
+
+async function resetAllDemoData() {
+  if (!confirm('Are you sure you want to reset all demo sessions and start completely clean with live data only?')) return;
+  try {
+    const res = await fetch('/api/chat/reset-demo-data', { method: 'POST' });
+    const data = await res.json();
+    if (data.success) {
+      consultationSessions = {};
+      activeSessionId = null;
+      activeAISessionId = null;
+      updateCategoryCounts();
+      renderContactsList();
+      renderAIContactsList();
+      renderEmptySessionDetail();
+      renderEmptyAISessionDetail();
+      alert('✅ All demo data cleared. CRM is now in live mode.');
+    }
+  } catch (err) {
+    console.error('Failed to reset demo data:', err);
+  }
+}
+
+function renderEmptySessionDetail() {
+  const dossierId = document.getElementById('dossier-customisation-id');
+  if (dossierId) dossierId.innerText = 'NO ACTIVE CHAT';
+
+  const custName = document.getElementById('dossier-customer-name');
+  if (custName) custName.innerText = 'Waiting for customer...';
+
+  const orderBadge = document.getElementById('dossier-order-badge');
+  if (orderBadge) orderBadge.innerText = '';
+
+  const prodTitle = document.getElementById('dossier-product-title');
+  if (prodTitle) prodTitle.innerText = 'No consultation selected';
+
+  const headerName = document.getElementById('wa-header-name');
+  if (headerName) headerName.innerText = 'No Consultation Selected';
+
+  const headerStatus = document.getElementById('wa-status-text');
+  if (headerStatus) headerStatus.innerText = 'Select a chat from the left panel';
+
+  const phoneBadge = document.getElementById('wa-customer-phone-badge');
+  if (phoneBadge) phoneBadge.style.display = 'none';
+
+  const waDirectBtn = document.getElementById('btn-wa-direct-link');
+  if (waDirectBtn) waDirectBtn.style.display = 'none';
+
+  const callDirectBtn = document.getElementById('btn-call-direct-link');
+  if (callDirectBtn) callDirectBtn.style.display = 'none';
+
+  const container = document.getElementById('wa-messages-container');
+  if (container) {
+    container.innerHTML = `
+      <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:#8696a0; text-align:center; padding:2rem;">
+        <span style="font-size:3rem; margin-bottom:12px;">💬</span>
+        <h4 style="margin:0 0 6px 0; color:#475569;">No Live Consultation Selected</h4>
+        <p style="margin:0; font-size:0.85rem; max-width:320px;">When a shopper on the storefront requests human tailoring assistance or is escalated by AI, their session will appear here in real time.</p>
+      </div>
+    `;
+  }
+
+  const standardToolbar = document.getElementById('wa-standard-toolbar');
+  if (standardToolbar) standardToolbar.style.display = 'none';
+
+  const lockedBar = document.getElementById('wa-locked-takeover-bar');
+  if (lockedBar) {
+    lockedBar.style.display = 'flex';
+    const lockText = document.getElementById('wa-lock-text');
+    if (lockText) lockText.innerText = 'No consultation active. Chats from the storefront will appear automatically.';
+    const lockActionBtn = document.getElementById('wa-lock-action-btn');
+    if (lockActionBtn) lockActionBtn.style.display = 'none';
+  }
+}
+
+function renderEmptyAISessionDetail() {
+  const dossierId = document.getElementById('ai-dossier-id');
+  if (dossierId) dossierId.innerText = 'NO ACTIVE AI SESSION';
+
+  const custName = document.getElementById('ai-dossier-customer');
+  if (custName) custName.innerText = 'Waiting for storefront shopper...';
+
+  const orderBadge = document.getElementById('ai-dossier-order');
+  if (orderBadge) orderBadge.innerText = '';
+
+  const prodTitle = document.getElementById('ai-dossier-product');
+  if (prodTitle) prodTitle.innerText = 'No AI consultation active';
+
+  const headerName = document.getElementById('ai-header-name');
+  if (headerName) headerName.innerText = 'No AI Chat Selected';
+
+  const container = document.getElementById('ai-messages-container');
+  if (container) {
+    container.innerHTML = `
+      <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:#8696a0; text-align:center; padding:2rem;">
+        <span style="font-size:3rem; margin-bottom:12px;">🤖</span>
+        <h4 style="margin:0 0 6px 0; color:#475569;">No Active AI Chats</h4>
+        <p style="margin:0; font-size:0.85rem; max-width:320px;">Live storefront customers speaking with the Gemini AI bespoke assistant will stream here in real time.</p>
+      </div>
+    `;
+  }
+}
+
 
 // Switch Filter Category inside Live Consultations (UNASSIGNED, MY_CHATS, ALL_STAFF)
 function switchChatCategory(category) {
@@ -995,6 +898,32 @@ async function handleTakeoverAIChat() {
     text: `⚡ ${user.name} intervened and took over the live consultation from AI Designer`
   });
 
+  // Sync to Backend
+  try {
+    fetch('/api/chat/takeover', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sessionId: session.id,
+        sessionToken: session.sessionToken || session.id,
+        designerName: user.name,
+        designerId: user.id,
+        designerRole: user.role
+      })
+    }).catch(e => console.warn(e));
+
+    fetch('/api/routing/takeover', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sessionId: session.id,
+        user: { id: user.id, name: user.name, role: user.role }
+      })
+    }).catch(e => console.warn(e));
+  } catch (err) {
+    console.warn('Takeover sync error', err);
+  }
+
   // Switch to Live Consultations Tab in "My Chats"
   activeSessionId = session.id;
   updateCategoryCounts();
@@ -1254,6 +1183,18 @@ async function handleClaimOrTakeover() {
     session.claimedByRole = user.role;
     session.isAIHandling = false;
     session.status = `🟢 live with ${user.name}`;
+
+    fetch('/api/chat/takeover', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sessionId: session.id,
+        sessionToken: session.sessionToken || session.id,
+        designerName: user.name,
+        designerId: user.id,
+        designerRole: user.role
+      })
+    }).catch(e => console.warn(e));
 
     if (previousOwner && previousOwner !== user.name) {
       session.messages.push({

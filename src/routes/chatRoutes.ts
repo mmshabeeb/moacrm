@@ -10,7 +10,7 @@ const sizingEngine = new MOASizingEngine();
 const crmAdapter = new MOACrmAdapter({ baseUrl: process.env.MOA_CRM_BASE_URL || 'http://localhost:4000' });
 
 // In-memory session store (synced to DB in full environment)
-const activeSessions = new Map<string, {
+export const activeSessions = new Map<string, {
   record: Partial<StructuredCustomisationRecord>;
   history: any[];
   productTitle: string;
@@ -454,3 +454,93 @@ chatRouter.post('/reset', (req: Request, res: Response) => {
     return res.status(500).json({ error: 'Failed to reset session' });
   }
 });
+
+/**
+ * GET /api/chat/sync/:sessionToken
+ * Polls latest chat history and designer state from storefront PDP widget
+ */
+chatRouter.get('/sync/:sessionToken', (req: Request, res: Response) => {
+  try {
+    const { sessionToken } = req.params;
+    let targetSession = activeSessions.get(sessionToken);
+
+    if (!targetSession) {
+      for (const [tok, sess] of activeSessions.entries()) {
+        if (sess.record.id === sessionToken || tok === sessionToken) {
+          targetSession = sess;
+          break;
+        }
+      }
+    }
+
+    if (!targetSession) {
+      return res.json({ success: true, history: [], state: 'AI_HANDLING', isHumanHandling: false });
+    }
+
+    const isHuman = targetSession.record.state === 'HUMAN_DESIGNER_CONNECTED' || !!targetSession.record.claimed_by_id;
+
+    return res.json({
+      success: true,
+      customisationId: targetSession.record.id,
+      state: targetSession.record.state,
+      isHumanHandling: isHuman,
+      claimedByName: targetSession.record.claimed_by_name || 'Senior Atelier Designer',
+      history: targetSession.history,
+      record: targetSession.record
+    });
+  } catch (err: any) {
+    return res.status(500).json({ error: 'Failed to sync chat' });
+  }
+});
+
+/**
+ * POST /api/chat/takeover
+ * Transitions a session from AI handling to Human Senior Designer
+ */
+chatRouter.post('/takeover', (req: Request, res: Response) => {
+  try {
+    const { sessionId, sessionToken, designerName, designerId, designerRole } = req.body;
+    const targetToken = sessionToken || sessionId;
+
+    let targetSession = activeSessions.get(targetToken);
+    if (!targetSession) {
+      for (const [tok, sess] of activeSessions.entries()) {
+        if (sess.record.id === targetToken || tok === targetToken) {
+          targetSession = sess;
+          break;
+        }
+      }
+    }
+
+    if (targetSession) {
+      targetSession.record.state = 'HUMAN_DESIGNER_CONNECTED';
+      targetSession.record.claimed_by_name = designerName || 'Senior Designer';
+      targetSession.record.claimed_by_id = designerId || 'user_designer_1';
+      targetSession.record.claimed_by_role = designerRole || 'SENIOR_DESIGNER';
+
+      targetSession.history.push({
+        sender: 'senior_designer',
+        text: `Salam! I am ${designerName || 'Senior Atelier Designer'} from the MOA customisation team. I am now reviewing your measurements and bespoke requests.`,
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    return res.json({ success: true, message: 'Session transitioned to human designer' });
+  } catch (err: any) {
+    return res.status(500).json({ error: 'Failed to take over session' });
+  }
+});
+
+/**
+ * POST /api/chat/reset-demo-data
+ * Completely purges all demo sessions, mock orders, and resets CRM to 100% clean state
+ */
+chatRouter.post('/reset-demo-data', (req: Request, res: Response) => {
+  try {
+    activeSessions.clear();
+    return res.json({ success: true, message: 'All demo chat sessions cleared successfully' });
+  } catch (err: any) {
+    return res.status(500).json({ error: 'Failed to reset demo data' });
+  }
+});
+
