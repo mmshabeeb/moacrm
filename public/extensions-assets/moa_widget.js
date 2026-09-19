@@ -63,10 +63,21 @@
       this.nudgeCount = 0;
       this.unreadCount = 0;
       this.renderedHistoryCount = 0;
-      this.syncPollInterval = null;
-
       this.initElements();
       this.bindEvents();
+
+      // Check for auto-open on return from login
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const shouldAutoOpen = urlParams.get('customise') === '1' || window.location.hash.indexOf('customise=1') !== -1 || sessionStorage.getItem('moa_auto_open_chat') === '1';
+        if (shouldAutoOpen) {
+          sessionStorage.removeItem('moa_auto_open_chat');
+          setTimeout(() => {
+            if (this.checkbox) this.checkbox.checked = true;
+            this.setCustomisationActive(true);
+          }, 350);
+        }
+      } catch (e) {}
     }
 
     initElements() {
@@ -271,7 +282,11 @@
         // If not logged in on live Shopify store, trigger default Shopify account login
         if (!isLoggedIn && window.location.pathname.indexOf('/products/') !== -1) {
           const returnPath = window.location.pathname + window.location.search + (window.location.search ? '&' : '?') + 'customise=1';
-          window.location.href = `/account/login?return_to=${encodeURIComponent(returnPath)}`;
+          try {
+            sessionStorage.setItem('moa_customise_redirect', returnPath);
+            sessionStorage.setItem('moa_auto_open_chat', '1');
+          } catch (e) {}
+          window.location.href = `/account/login?checkout_url=${encodeURIComponent(returnPath)}&return_to=${encodeURIComponent(returnPath)}`;
           return;
         }
 
@@ -1029,6 +1044,15 @@
       return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
     }
   }
+
+  // Auto-redirect back to PDP if customer landed on /account after bespoke login
+  try {
+    const pendingRedirect = sessionStorage.getItem('moa_customise_redirect');
+    if (pendingRedirect && window.location.pathname.startsWith('/account') && window.location.pathname.indexOf('/account/login') === -1) {
+      sessionStorage.removeItem('moa_customise_redirect');
+      window.location.replace(pendingRedirect);
+    }
+  } catch (e) {}
 
   // Auto-initialize when DOM is ready
   if (document.readyState === 'loading') {
