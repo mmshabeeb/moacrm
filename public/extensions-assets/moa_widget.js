@@ -242,17 +242,17 @@
     }
 
     async syncCustomerInfo() {
-      if (!this.customerProfile || (!this.customerProfile.name && !this.customerProfile.phone)) return;
+      if (!this.customerProfile || (!this.customerProfile.name && !this.customerProfile.email && !this.customerProfile.id)) return;
       try {
         await fetch(`${this.apiBase}/api/chat/customer-info`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             sessionToken: this.sessionToken,
-            customerName: this.customerProfile.name,
-            customerPhone: this.customerProfile.phone,
-            customerEmail: this.customerProfile.email,
-            customerId: this.customerProfile.id,
+            customerName: this.customerProfile.name || (this.customerProfile.email ? this.customerProfile.email.split('@')[0] : 'Storefront Customer'),
+            customerPhone: this.customerProfile.phone || '',
+            customerEmail: this.customerProfile.email || '',
+            customerId: this.customerProfile.id || '',
             productTitle: this.productTitle,
             productCategory: this.productCategory
           })
@@ -262,91 +262,24 @@
       }
     }
 
-    renderCustomerIdentificationGate() {
-      if (this.customerProfile.name && this.customerProfile.phone) return;
-      const existing = document.getElementById('moa-cust-gate');
-      if (existing) return;
-
-      const gate = document.createElement('div');
-      gate.id = 'moa-cust-gate';
-      gate.className = 'moa-customer-gate-card';
-      gate.innerHTML = `
-        <div class="moa-gate-header">
-          <span class="moa-gate-badge">👑 VIP Atelier Registration</span>
-          <h4 class="moa-gate-title">Welcome to Bespoke Tailoring</h4>
-          <p class="moa-gate-desc">Please share your name and WhatsApp/mobile number so our AI & Senior Atelier Designers can attach your measurements and follow up on WhatsApp.</p>
-        </div>
-        <form id="moa-gate-form" class="moa-gate-form">
-          <div class="moa-gate-field">
-            <label>Your Full Name *</label>
-            <input type="text" id="moa-gate-name" placeholder="e.g. Fatima Al-Nuaimi" required value="${this.customerProfile.name || ''}" />
-          </div>
-          <div class="moa-gate-field">
-            <label>Mobile / WhatsApp Number *</label>
-            <input type="tel" id="moa-gate-phone" placeholder="e.g. +971 50 123 4567 or +91 98..." required value="${this.customerProfile.phone || ''}" />
-          </div>
-          <div class="moa-gate-field">
-            <label>Email Address (Optional)</label>
-            <input type="email" id="moa-gate-email" placeholder="e.g. fatima@example.com" value="${this.customerProfile.email || ''}" />
-          </div>
-          <button type="submit" class="moa-gate-btn">✨ Start Bespoke Customisation</button>
-          <div class="moa-gate-footer">
-            <a href="/account/login?return_to=${encodeURIComponent(window.location.pathname)}" class="moa-gate-login-link">Already have an account? Sign In</a>
-          </div>
-        </form>
-      `;
-
-      if (this.messagesContainer) {
-        this.messagesContainer.prepend(gate);
-        this.scrollToBottom();
-      }
-
-      const form = gate.querySelector('#moa-gate-form');
-      if (form) {
-        form.addEventListener('submit', (e) => {
-          e.preventDefault();
-          const name = (gate.querySelector('#moa-gate-name')?.value || '').trim();
-          const phone = (gate.querySelector('#moa-gate-phone')?.value || '').trim();
-          const email = (gate.querySelector('#moa-gate-email')?.value || '').trim();
-
-          if (!name || !phone) {
-            alert('Please enter your Name and Mobile / WhatsApp number to proceed.');
-            return;
-          }
-
-          this.customerProfile = {
-            id: this.customerProfile.id || `CUST-${Math.floor(100000 + Math.random() * 900000)}`,
-            name,
-            phone,
-            email
-          };
-          localStorage.setItem('moa_customer_profile', JSON.stringify(this.customerProfile));
-          gate.remove();
-
-          // Dispatch to CRM
-          this.syncCustomerInfo();
-
-          this.appendMessage({
-            incoming: true,
-            author: 'MOA AI Designer',
-            text: `Marhaba ${name}! 👋 Your bespoke customisation dossier is ready. What is your height (e.g. 165 cm) and preferred fit?`,
-            time: this.formatCurrentTime()
-          });
-          if (this.input) this.input.focus();
-        });
-      }
-    }
-
     setCustomisationActive(active) {
       this.isCustomising = active;
       if (this.checkbox) this.checkbox.checked = active;
 
       if (active) {
-        // Checked: Open the floating modal window directly
+        const isLoggedIn = !!(this.customerProfile.id || this.customerProfile.email);
+        // If not logged in on live Shopify store, trigger default Shopify account login
+        if (!isLoggedIn && window.location.pathname.indexOf('/products/') !== -1) {
+          const returnPath = window.location.pathname + window.location.search + (window.location.search ? '&' : '?') + 'customise=1';
+          window.location.href = `/account/login?return_to=${encodeURIComponent(returnPath)}`;
+          return;
+        }
+
+        // Checked: Open the floating modal window directly into AI bespoke chat
         this.openPanel();
-        this.renderCustomerIdentificationGate();
         this.updateCartButtonState(true);
         this.startLiveSyncPolling();
+        this.syncCustomerInfo();
 
         if (!this.userHasTexted && this.nudgeCount === 0) {
           this.startIdleNudgeTimer();
