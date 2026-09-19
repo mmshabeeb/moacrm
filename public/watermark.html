@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MOA: Product Image Watermark | Shopify Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/watermark.css">
+</head>
+<body>
+
+  <!-- Shopify App Topbar -->
+  <header class="app-topbar">
+    <div class="app-brand">
+      <div class="app-logo-badge">W</div>
+      <span class="app-brand-title">Oh: Product Image Watermark</span>
+    </div>
+    <div class="app-top-actions">
+      <a href="/" class="btn btn-secondary btn-sm">Return to CRM</a>
+      <button class="btn btn-primary btn-sm" id="btn-save-rule">Save</button>
+    </div>
+  </header>
+
+  <div class="app-container">
+    <!-- Left App Sidebar -->
+    <aside class="app-sidebar">
+      <div class="nav-group-title">Navigation</div>
+      <a class="nav-item active" href="#">
+        <span class="nav-item-icon">🖼️</span>
+        <span>Watermark Rules</span>
+      </a>
+      <a class="nav-item" href="#page-watermark">
+        <span class="nav-item-icon">📄</span>
+        <span>Page watermark</span>
+      </a>
+      <a class="nav-item" href="#right-click">
+        <span class="nav-item-icon">🛡️</span>
+        <span>Right-click protection</span>
+      </a>
+      <a class="nav-item" href="#pricing">
+        <span class="nav-item-icon">💎</span>
+        <span>Pricing</span>
+      </a>
+      <a class="nav-item" href="#settings">
+        <span class="nav-item-icon">⚙️</span>
+        <span>Settings</span>
+      </a>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="app-main">
+      <!-- Rule Title Header -->
+      <div class="rule-page-header">
+        <div class="rule-title-group">
+          <button class="btn-back" title="Back to Rules">←</button>
+          <h1 class="rule-main-title" id="rule-main-title">Logo</h1>
+        </div>
+        <div class="rule-header-actions">
+          <button class="btn btn-secondary" id="btn-view-images">View images</button>
+          <button class="btn btn-destructive" id="btn-delete-rule">Delete</button>
+        </div>
+      </div>
+
+      <div class="rule-grid">
+        <!-- Left Column: Form Configuration -->
+        <div class="rule-config-col">
+          
+          <!-- 1. Rule Details -->
+          <div class="polaris-card">
+            <h2 class="card-title">Rule details</h2>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="rule-name">Rule name</label>
+                <input type="text" id="rule-name" class="form-control" value="Logo">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="rule-status">Status</label>
+                <select id="rule-status" class="form-control">
+                  <option value="active" selected>Active</option>
+                  <option value="draft">Draft</option>
+                  <option value="inactive">Inactive</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Text Watermark -->
+          <div class="polaris-card">
+            <label class="card-checkbox-title">
+              <input type="checkbox" id="toggle-text-watermark">
+              <span>Text watermark</span>
+            </label>
+            <div id="text-watermark-controls" style="display: none; margin-top: 16px;">
+              <div class="form-group">
+                <label class="form-label" for="watermark-text">Watermark Text</label>
+                <input type="text" id="watermark-text" class="form-control" value="MALL OF ABAYAS" placeholder="Enter text">
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="text-opacity">Opacity (%)</label>
+                  <div class="input-suffix-group">
+                    <input type="number" id="text-opacity" class="form-control" value="80" min="0" max="100">
+                    <span class="input-suffix">%</span>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="text-rotation">Rotation Angle</label>
+                  <div class="input-suffix-group">
+                    <input type="number" id="text-rotation" class="form-control" value="-15" min="-180" max="180">
+                    <span class="input-suffix">deg</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. Image Watermark -->
+          <div class="polaris-card">
+            <label class="card-checkbox-title">
+              <input type="checkbox" id="toggle-image-watermark" checked>
+              <span>Image watermark</span>
+            </label>
+
+            <div id="image-watermark-controls" style="margin-top: 16px;">
+              <!-- Upload & Thumbnail Box -->
+              <div class="image-uploader-box">
+                <div class="image-thumb-preview">
+                  <img src="/watermark-logo.svg" alt="Watermark Logo" id="logo-thumb-img">
+                </div>
+                <div class="image-uploader-actions">
+                  <input type="file" id="logo-file-input" accept="image/png,image/jpeg,image/svg+xml" style="display:none">
+                  <button type="button" class="btn btn-secondary btn-sm" id="btn-replace-logo">Replace</button>
+                  <button type="button" class="link-btn" id="btn-remove-logo">Remove</button>
+                </div>
+              </div>
+
+              <!-- Layout selection -->
+              <div class="form-group">
+                <label class="form-label">Layout</label>
+                <div class="radio-group">
+                  <label class="radio-item">
+                    <input type="radio" name="layout" id="layout-single" value="single" checked>
+                    <span>Single position</span>
+                  </label>
+                  <div class="sub-input-container" id="single-position-group">
+                    <select id="image-position-select" class="form-control">
+                      <option value="center-right" selected>Center right</option>
+                      <option value="center-left">Center left</option>
+                      <option value="center">Center</option>
+                      <option value="top-left">Top left</option>
+                      <option value="top-center">Top center</option>
+                      <option value="top-right">Top right</option>
+                      <option value="bottom-left">Bottom left</option>
+                      <option value="bottom-center">Bottom center</option>
+                      <option value="bottom-right">Bottom right</option>
+                    </select>
+                  </div>
+                  <label class="radio-item">
+                    <input type="radio" name="layout" id="layout-tile" value="tile">
+                    <span>Tile across image</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Opacity & Image Size -->
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="image-opacity">Opacity</label>
+                  <div class="input-suffix-group">
+                    <input type="number" id="image-opacity" class="form-control" value="100" min="0" max="100">
+                    <span class="input-suffix">%</span>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="image-size">Image size</label>
+                  <div class="input-suffix-group">
+                    <input type="number" id="image-size" class="form-control" value="500" min="50" max="2000">
+                    <span class="input-suffix">px</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- More Options Accordion -->
+              <div>
+                <span class="collapsible-trigger" id="more-options-toggle">More options ⌵</span>
+                <div class="collapsible-content" id="more-options-content">
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label class="form-label" for="image-rotation">Rotation Angle</label>
+                      <div class="input-suffix-group">
+                        <input type="number" id="image-rotation" class="form-control" value="0" min="-180" max="180">
+                        <span class="input-suffix">deg</span>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label" for="image-blend-mode">Blend Mode</label>
+                      <select id="image-blend-mode" class="form-control">
+                        <option value="normal" selected>Normal</option>
+                        <option value="multiply">Multiply</option>
+                        <option value="screen">Screen</option>
+                        <option value="overlay">Overlay</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. Applies to -->
+          <div class="polaris-card">
+            <h2 class="card-title">Applies to</h2>
+            <div class="form-group">
+              <label class="form-label" for="applies-products">Products to watermark</label>
+              <select id="applies-products" class="form-control">
+                <option value="all" selected>All products</option>
+                <option value="collection">Specific collections</option>
+                <option value="specific">Specific products</option>
+                <option value="tags">Product tags</option>
+              </select>
+              <div class="helper-text">
+                <span>68 products will be watermarked</span>
+                <span>🔄</span>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-top: 16px;">
+              <label class="form-label" for="applies-images">Images to watermark</label>
+              <select id="applies-images" class="form-control">
+                <option value="all" selected>All images</option>
+                <option value="first">First image only</option>
+                <option value="exclude-first">Exclude first image</option>
+              </select>
+            </div>
+
+            <div style="margin-top: 16px;">
+              <label class="checkbox-item">
+                <input type="checkbox" id="skip-watermarked" checked>
+                <span>Skip images already watermarked by other rules</span>
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" id="apply-new-images" checked>
+                <span>Apply to new product images</span>
+              </label>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right Column: Live Interactive Preview -->
+        <div class="rule-preview-col">
+          <div class="polaris-card preview-card">
+            <h2 class="card-title">Preview</h2>
+            
+            <div class="form-group">
+              <select id="preview-product-select" class="form-control"></select>
+            </div>
+
+            <div class="form-group">
+              <select id="preview-image-select" class="form-control"></select>
+            </div>
+
+            <!-- Visual Preview Sandbox -->
+            <div class="preview-canvas-wrapper" id="preview-canvas-container">
+              <div class="preview-image-container">
+                <img id="preview-base-img" class="preview-base-img" src="" alt="Product Preview">
+                <div id="preview-watermark-layer" class="preview-watermark-layer"></div>
+              </div>
+            </div>
+
+            <p class="preview-instructions">Click the image to view it larger.</p>
+
+            <div class="preview-button-row">
+              <button type="button" class="btn btn-secondary" id="btn-view-larger">
+                🔍 View larger
+              </button>
+              <button type="button" class="btn btn-secondary" id="btn-download-preview">
+                ⬇ Download
+              </button>
+            </div>
+
+            <div style="margin-top: 14px;">
+              <button type="button" class="btn btn-primary" id="btn-apply-rule" style="width: 100%;">
+                ⚡ Apply Rule to Store Products
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Large View Modal -->
+  <div class="modal-backdrop" id="preview-modal">
+    <div class="modal-content">
+      <button class="modal-close-btn" id="modal-close-btn">✕</button>
+      <h3 style="margin-bottom: 12px; font-size: 16px;">High-Resolution Watermark Preview</h3>
+      <img id="modal-preview-img" class="modal-img-preview" src="" alt="High Res Preview">
+    </div>
+  </div>
+
+  <script src="/watermark.js"></script>
+</body>
+</html>

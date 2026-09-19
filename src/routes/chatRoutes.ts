@@ -107,6 +107,101 @@ chatRouter.post('/message', async (req: Request, res: Response) => {
 });
 
 /**
+ * POST /api/chat/voice-message
+ * Handles WhatsApp-style incoming customer voice notes from the Shopify PDP
+ */
+chatRouter.post('/voice-message', async (req: Request, res: Response) => {
+  try {
+    const { sessionToken, audioBase64, mimeType, productTitle, productCategory } = req.body;
+
+    if (!sessionToken || !audioBase64) {
+      return res.status(400).json({ error: 'Missing sessionToken or audioBase64' });
+    }
+
+    let session = activeSessions.get(sessionToken);
+    if (!session) {
+      session = {
+        record: {
+          id: `MOA-CUS-${Math.floor(100000 + Math.random() * 900000)}`,
+          product_title: productTitle || 'Mall of Abayas Product',
+          fit_preference: 'regular',
+          state: 'AI_HANDLING',
+          customisation_status: 'GATHERING',
+          customer_confirmed: false,
+          requires_extra_charge: false
+        },
+        history: [],
+        productTitle: productTitle || 'Mall of Abayas Product',
+        productCategory: productCategory || 'abaya_standard'
+      };
+      activeSessions.set(sessionToken, session);
+    }
+
+    // Process Voice Note with Gemini Multimodal Audio
+    const turnResult = await aiEngine.processVoiceTurn({
+      audioBase64,
+      mimeType: mimeType || 'audio/webm',
+      history: session.history,
+      currentRecord: session.record,
+      productTitle: session.productTitle,
+      productCategory: session.productCategory
+    });
+
+    const userLabel = turnResult.transcribedText ? `🎙️ Voice: "${turnResult.transcribedText}"` : '🎙️ Voice Note';
+
+    // Add user voice message to history
+    session.history.push({
+      sender: 'user',
+      text: userLabel,
+      audioBase64: `data:${mimeType || 'audio/webm'};base64,${audioBase64}`,
+      transcribedText: turnResult.transcribedText,
+      timestamp: new Date().toISOString()
+    });
+
+    // Update session record
+    session.record = { ...session.record, ...turnResult.updatedRecord };
+
+    // Record AI response to history
+    session.history.push({
+      sender: turnResult.escalationTriggered ? 'senior_designer' : 'ai',
+      text: turnResult.replyMessage,
+      timestamp: new Date().toISOString()
+    });
+
+    // If escalation triggered, dispatch dossier to MOA CRM
+    if (turnResult.escalationTriggered) {
+      await crmAdapter.escalateToDesigner({
+        session_id: session.record.id || sessionToken,
+        product_title: session.productTitle,
+        current_recommended_size: session.record.recommended_size,
+        measurements_summary: {
+          height: session.record.height_cm ? `${session.record.height_cm} cm` : undefined,
+          bust: session.record.bust_inches ? `${session.record.bust_inches}"` : undefined
+        },
+        requested_alterations: session.record.custom_requests || [],
+        escalation_trigger: 'BESPOKE_OUT_OF_BOUNDS',
+        reason_for_escalation: turnResult.escalationReason || 'Custom tailoring review required',
+        chat_history: session.history
+      });
+    }
+
+    return res.json({
+      success: true,
+      customisationId: session.record.id,
+      transcribedText: turnResult.transcribedText,
+      replyMessage: turnResult.replyMessage,
+      state: turnResult.updatedState,
+      status: turnResult.customisationStatus,
+      showVerificationCard: turnResult.showVerificationCard,
+      verificationSummary: turnResult.verificationSummary
+    });
+  } catch (error: any) {
+    console.error('Voice chat error:', error);
+    return res.status(500).json({ error: 'Failed to process voice note consultation' });
+  }
+});
+
+/**
  * POST /api/chat/confirm
  * Customer explicitly clicks "Confirm My Customisation"
  */

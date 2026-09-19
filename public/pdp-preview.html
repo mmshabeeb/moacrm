@@ -498,13 +498,34 @@
                 type="text" 
                 id="moa-user-input" 
                 class="moa-wa-input-field" 
-                placeholder="Type measurements (e.g. 165 cm, loose fit)..." 
+                placeholder="Type measurements or speak below..." 
                 autocomplete="off"
               />
-              <button type="submit" class="moa-wa-send-btn" title="Send message">
+              <button type="button" class="moa-wa-mic-btn" id="moa-mic-btn" title="Record Voice Note" onclick="window.MOA_WIDGET && window.MOA_WIDGET.startVoiceRecording()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+                  <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+                </svg>
+              </button>
+              <button type="submit" class="moa-wa-send-btn" id="moa-send-btn" title="Send message" style="display:none;">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
               </button>
             </form>
+
+            <!-- WhatsApp Style Voice Recording Bar Overlay -->
+            <div id="moa-recording-bar" class="moa-wa-recording-bar" style="display: none;">
+              <button type="button" class="moa-rec-cancel-btn" id="moa-rec-cancel" title="Delete Recording">🗑️</button>
+              <div class="moa-rec-status">
+                <span class="moa-rec-dot"></span>
+                <span id="moa-rec-timer" class="moa-rec-timer">0:00</span>
+                <div class="moa-rec-wave">
+                  <span></span><span></span><span></span><span></span><span></span>
+                </div>
+              </div>
+              <button type="button" class="moa-rec-send-btn" id="moa-rec-send" title="Send Voice Note">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+              </button>
+            </div>
           </div>
 
           <!-- Hidden Shopify Cart Line Item Properties (Injected on customisation confirmation) -->

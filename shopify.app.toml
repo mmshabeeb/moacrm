@@ -1,8 +1,8 @@
 # Mall of Abayas (MOA) Shopify App Configuration
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
-name = "Mall of Abayas (MOA) AI Designer & Production CRM"
-client_id = "moa-shopify-customisation-crm"
+name = "MOA Developer Access"
+client_id = "69cf40de6b2289cbd26f4e567d71f516"
 application_url = "https://crm.mallofabayas.com"
 embedded = true
 

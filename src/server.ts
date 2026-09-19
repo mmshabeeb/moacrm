@@ -10,6 +10,7 @@ import { userRouter } from './routes/userRoutes';
 import { mediaRouter } from './routes/mediaRoutes';
 import { routingRouter } from './routes/routingRoutes';
 import { aiTrainingRouter } from './routes/aiTrainingRoutes';
+import { watermarkRouter } from './routes/watermarkRoutes';
 import { handleShopifyOrderCreateWebhook } from './webhooks/shopifyOrderWebhook';
 
 dotenv.config();
@@ -35,6 +36,7 @@ app.use('/api/users', userRouter);
 app.use('/api/media', mediaRouter);
 app.use('/api/routing', routingRouter);
 app.use('/api/ai', aiTrainingRouter);
+app.use('/api/watermark', watermarkRouter);
 
 // Shopify Webhook endpoint
 app.post('/webhooks/shopify/orders/create', handleShopifyOrderCreateWebhook);
@@ -42,6 +44,11 @@ app.post('/webhooks/shopify/orders/create', handleShopifyOrderCreateWebhook);
 // Dedicated Login Page Route
 app.get('/login', (req, res) => {
   res.sendFile(path.join(publicDir, 'login.html'));
+});
+
+// Dedicated Watermark App Page & Shopify Embedded Routes
+app.get(['/watermark', '/watermark/rules', '/watermark/rules/:id', '/apps/oh-watermark/app/rules/:id'], (req, res) => {
+  res.sendFile(path.join(publicDir, 'watermark.html'));
 });
 
 // Health check endpoint

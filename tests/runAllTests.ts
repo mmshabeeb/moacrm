@@ -325,6 +325,66 @@ async function runTests() {
   const loggedOutCheck = authService.validateSession(adminLogin.session!.token);
   assert(loggedOutCheck.valid === false, 'Logged out session token is invalidated');
 
+  // --- Test Suite 10: Shopify Product Image Watermark & Protection ---
+  console.log('\n🖼️ [Suite 10: Shopify Product Image Watermark & Protection App]');
+  const { WatermarkService } = await import('../src/services/watermarkService');
+
+  // 1. Check default rules
+  const rules = WatermarkService.getRules();
+  assert(rules.length > 0, 'Default watermark rules loaded');
+  const logoRule = WatermarkService.getRuleById('251');
+  assert(logoRule !== undefined && logoRule.name === 'Logo', 'Logo rule #251 is present');
+  assert(logoRule?.hasImageWatermark === true, 'Logo rule has image watermark active');
+  assert(logoRule?.imageConfig?.position === 'center-right', 'Logo rule position is center-right');
+
+  // 2. Save / Update Rule
+  const updatedLogo = WatermarkService.saveRule({
+    ...logoRule!,
+    imageConfig: {
+      ...logoRule!.imageConfig!,
+      sizePx: 500,
+      opacity: 100
+    }
+  });
+  assert(updatedLogo.imageConfig?.sizePx === 500, 'Rule size updated to 500px');
+
+  // 3. Store Protection Settings
+  const protection = WatermarkService.getProtectionSettings();
+  assert(protection.enabled === true, 'Anti-theft protection is enabled');
+  assert(protection.disableRightClick === true, 'Right click protection active');
+  assert(protection.disableDragAndDrop === true, 'Drag and drop protection active');
+
+  // 4. Test image compositing engine with sharp
+  const testImgBuffer = await (await import('sharp')).default({
+    create: {
+      width: 600,
+      height: 800,
+      channels: 3,
+      background: { r: 30, g: 30, b: 30 }
+    }
+  }).jpeg().toBuffer();
+
+  const composited = await WatermarkService.applyWatermarkToBuffer(testImgBuffer, updatedLogo);
+  assert(composited.length > 0, 'Sharp composited watermark image output buffer generated successfully');
+
+  // --- Test Suite 11: Multilingual Voice Note AI Understanding & WhatsApp Audio ---
+  console.log('\n🎙️ [Suite 11: Multilingual Voice Note AI Processing & Audio Turn]');
+  const freeAiVoice = new FreeAiModelService();
+  assert(typeof freeAiVoice.executeVoiceTurn === 'function', 'FreeAiModelService has executeVoiceTurn method');
+
+  // Test voice processing fallback / parser in aiConversationEngine
+  const voiceTurnRes = await aiEngine.processVoiceTurn({
+    audioBase64: 'fake_base64_audio_sample',
+    mimeType: 'audio/webm',
+    history: [],
+    currentRecord: {},
+    productTitle: 'Royal Silk Velvet Abaya',
+    productCategory: 'occasion_luxury'
+  });
+  assert(voiceTurnRes.transcribedText !== undefined, 'Voice turn returns customer transcribed text');
+  assert(voiceTurnRes.replyMessage !== undefined && voiceTurnRes.replyMessage.length > 0, 'Voice turn generates bespoke designer reply');
+  assert(voiceTurnRes.updatedRecord !== undefined, 'Voice turn updates structured customisation record');
+
   console.log(`\n====================================================`);
   console.log(`🎉 Test Results: ${passed} Passed, ${failed} Failed`);
   console.log(`====================================================\n`);

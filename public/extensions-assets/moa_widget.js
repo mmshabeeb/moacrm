@@ -54,6 +54,18 @@
       this.form = document.getElementById('moa-chat-form');
       this.input = document.getElementById('moa-user-input');
       this.minimizeBtn = document.getElementById('moa-minimize-chat');
+      this.micBtn = document.getElementById('moa-mic-btn');
+      this.recordingBar = document.getElementById('moa-recording-bar');
+      this.recTimer = document.getElementById('moa-rec-timer');
+      this.recCancelBtn = document.getElementById('moa-rec-cancel');
+      this.recSendBtn = document.getElementById('moa-rec-send');
+
+      // Voice Recorder State
+      this.mediaRecorder = null;
+      this.audioChunks = [];
+      this.recordingInterval = null;
+      this.recordingSeconds = 0;
+      this.isRecording = false;
 
       // Hidden Shopify Line Item Property fields
       this.props = {
@@ -99,6 +111,29 @@
           if (this.input.value.trim().length > 0) {
             this.clearIdleNudgeTimer();
           }
+        });
+      }
+
+      // Voice Recording Controls
+      if (this.micBtn) {
+        this.micBtn.addEventListener('click', () => {
+          if (!this.isRecording) {
+            this.startVoiceRecording();
+          } else {
+            this.sendVoiceRecording();
+          }
+        });
+      }
+
+      if (this.recCancelBtn) {
+        this.recCancelBtn.addEventListener('click', () => {
+          this.cancelVoiceRecording();
+        });
+      }
+
+      if (this.recSendBtn) {
+        this.recSendBtn.addEventListener('click', () => {
+          this.sendVoiceRecording();
         });
       }
     }
@@ -359,6 +394,256 @@
           text: "Salam! We received your measurements. Our tailoring workshop will craft this abaya with precision.",
           time: this.formatCurrentTime()
         });
+      }
+    }
+
+    /* --------------------------------------------------------------------------
+       WhatsApp-Style Voice Note Recording Lifecycle
+       -------------------------------------------------------------------------- */
+    async startVoiceRecording() {
+      try {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          alert('Microphone access is not supported in this browser. Please type your message.');
+          return;
+        }
+
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        this.audioChunks = [];
+        
+        let mimeType = 'audio/webm;codecs=opus';
+        if (!MediaRecorder.isTypeSupported(mimeType)) {
+          mimeType = MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4' : 'audio/ogg';
+        }
+
+        this.mediaRecorder = new MediaRecorder(stream, { mimeType });
+        this.mediaRecorder.ondataavailable = (event) => {
+          if (event.data && event.data.size > 0) {
+            this.audioChunks.push(event.data);
+          }
+        };
+
+        this.mediaRecorder.start(100);
+        this.isRecording = true;
+        this.recordingSeconds = 0;
+
+        // UI Updates: show recording bar, pulse mic
+        if (this.recordingBar) this.recordingBar.style.display = 'flex';
+        if (this.micBtn) this.micBtn.classList.add('recording');
+        if (this.recTimer) this.recTimer.innerText = '0:00';
+
+        this.recordingInterval = setInterval(() => {
+          this.recordingSeconds++;
+          const mins = Math.floor(this.recordingSeconds / 60);
+          const secs = (this.recordingSeconds % 60).toString().padStart(2, '0');
+          if (this.recTimer) this.recTimer.innerText = `${mins}:${secs}`;
+        }, 1000);
+
+        this.userHasTexted = true;
+        this.clearIdleNudgeTimer();
+      } catch (err) {
+        console.error('Microphone access denied / error:', err);
+        alert('Please allow microphone permissions to record your voice message.');
+      }
+    }
+
+    cancelVoiceRecording() {
+      if (this.mediaRecorder && this.isRecording) {
+        this.mediaRecorder.stop();
+        if (this.mediaRecorder.stream) {
+          this.mediaRecorder.stream.getTracks().forEach(t => t.stop());
+        }
+      }
+      this.audioChunks = [];
+      this.isRecording = false;
+      if (this.recordingInterval) {
+        clearInterval(this.recordingInterval);
+        this.recordingInterval = null;
+      }
+      if (this.recordingBar) this.recordingBar.style.display = 'none';
+      if (this.micBtn) this.micBtn.classList.remove('recording');
+    }
+
+    async sendVoiceRecording() {
+      if (!this.mediaRecorder || !this.isRecording) return;
+
+      const durationText = this.recTimer ? this.recTimer.innerText : '0:05';
+      const mimeType = this.mediaRecorder.mimeType || 'audio/webm';
+
+      this.mediaRecorder.onstop = async () => {
+        if (this.mediaRecorder.stream) {
+          this.mediaRecorder.stream.getTracks().forEach(t => t.stop());
+        }
+
+        const audioBlob = new Blob(this.audioChunks, { type: mimeType });
+        if (audioBlob.size === 0) return;
+
+        const reader = new FileReader();
+        reader.readAsDataURL(audioBlob);
+        reader.onloadend = async () => {
+          const base64DataUrl = reader.result;
+          const base64Audio = base64DataUrl.split(',')[1];
+
+          // Render Outgoing Voice Note Bubble
+          this.appendVoiceMessage({
+            incoming: false,
+            author: 'You',
+            audioUrl: base64DataUrl,
+            duration: durationText,
+            time: this.formatCurrentTime()
+          });
+
+          this.showTypingIndicator();
+
+          try {
+            const response = await fetch(`${this.apiBase}/api/chat/voice-message`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                sessionToken: this.sessionToken,
+                audioBase64: base64Audio,
+                mimeType: mimeType,
+                productTitle: this.productTitle,
+                productCategory: this.productCategory
+              })
+            });
+
+            const data = await response.json();
+            this.removeTypingIndicator();
+
+            if (data.success && data.replyMessage) {
+              this.appendMessage({
+                incoming: true,
+                author: data.state === 'HUMAN_DESIGNER_CONNECTED' ? 'Senior Designer' : 'MOA AI Designer',
+                text: data.replyMessage,
+                time: this.formatCurrentTime()
+              });
+
+              if (data.showVerificationCard && data.verificationSummary) {
+                this.renderVerificationCard(data.verificationSummary);
+              }
+            } else {
+              this.appendMessage({
+                incoming: true,
+                author: 'MOA Designer',
+                text: "Thank you for the voice note! I've noted your bespoke tailoring specifications.",
+                time: this.formatCurrentTime()
+              });
+            }
+          } catch (err) {
+            console.error('Error processing voice note:', err);
+            this.removeTypingIndicator();
+            this.appendMessage({
+              incoming: true,
+              author: 'MOA Designer',
+              text: "Salam! We received your voice message. Our tailoring team will craft your abaya with care.",
+              time: this.formatCurrentTime()
+            });
+          }
+        };
+      };
+
+      this.mediaRecorder.stop();
+      this.isRecording = false;
+      if (this.recordingInterval) {
+        clearInterval(this.recordingInterval);
+        this.recordingInterval = null;
+      }
+      if (this.recordingBar) this.recordingBar.style.display = 'none';
+      if (this.micBtn) this.micBtn.classList.remove('recording');
+    }
+
+    appendVoiceMessage({ incoming, author, audioUrl, duration, time, transcript }) {
+      if (!this.messagesContainer) return;
+
+      const bubble = document.createElement('div');
+      bubble.className = `moa-wa-bubble ${incoming ? 'moa-wa-incoming' : 'moa-wa-outgoing'} moa-voice-bubble`;
+      
+      const audioId = `moa-audio-${Math.floor(100000 + Math.random() * 900000)}`;
+
+      bubble.innerHTML = `
+        <span class="moa-wa-author">${incoming ? author : 'You'}</span>
+        <div class="moa-audio-player">
+          <button type="button" class="moa-audio-play-btn" id="play-${audioId}" title="Play Voice Note">
+            <svg class="icon-play" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            <svg class="icon-pause" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+          </button>
+          <div class="moa-audio-track">
+            <div class="moa-audio-progress-bar" id="bar-${audioId}">
+              <div class="moa-audio-progress-fill" id="fill-${audioId}" style="width: 0%;"></div>
+            </div>
+            <div class="moa-audio-meta">
+              <span id="time-${audioId}">0:00</span>
+              <span>${duration || '0:05'}</span>
+            </div>
+          </div>
+          <div class="moa-audio-mic-badge">🎙️</div>
+        </div>
+        <audio id="audio-${audioId}" src="${audioUrl}" preload="metadata"></audio>
+        ${transcript ? `<p class="moa-voice-transcript"><em>🗣️ "${transcript}"</em></p>` : ''}
+        <div class="moa-wa-meta">
+          <span>${time}</span>
+          ${!incoming ? '<span style="color:#8b5a2b; margin-left:3px;">✓✓</span>' : ''}
+        </div>
+      `;
+
+      this.messagesContainer.appendChild(bubble);
+      this.scrollToBottom();
+
+      // Audio Player Click Handlers
+      const audioEl = bubble.querySelector(`#audio-${audioId}`);
+      const playBtn = bubble.querySelector(`#play-${audioId}`);
+      const playIcon = playBtn?.querySelector('.icon-play');
+      const pauseIcon = playBtn?.querySelector('.icon-pause');
+      const fillBar = bubble.querySelector(`#fill-${audioId}`);
+      const timeSpan = bubble.querySelector(`#time-${audioId}`);
+      const progBar = bubble.querySelector(`#bar-${audioId}`);
+
+      if (audioEl && playBtn) {
+        playBtn.addEventListener('click', () => {
+          if (audioEl.paused) {
+            // Pause all other audios first
+            document.querySelectorAll('audio').forEach(a => {
+              if (a !== audioEl && !a.paused) {
+                a.pause();
+                a.currentTime = 0;
+              }
+            });
+            audioEl.play();
+            if (playIcon) playIcon.style.display = 'none';
+            if (pauseIcon) pauseIcon.style.display = 'block';
+          } else {
+            audioEl.pause();
+            if (playIcon) playIcon.style.display = 'block';
+            if (pauseIcon) pauseIcon.style.display = 'none';
+          }
+        });
+
+        audioEl.addEventListener('timeupdate', () => {
+          if (audioEl.duration) {
+            const pct = (audioEl.currentTime / audioEl.duration) * 100;
+            if (fillBar) fillBar.style.width = `${pct}%`;
+            const curMin = Math.floor(audioEl.currentTime / 60);
+            const curSec = Math.floor(audioEl.currentTime % 60).toString().padStart(2, '0');
+            if (timeSpan) timeSpan.innerText = `${curMin}:${curSec}`;
+          }
+        });
+
+        audioEl.addEventListener('ended', () => {
+          if (playIcon) playIcon.style.display = 'block';
+          if (pauseIcon) pauseIcon.style.display = 'none';
+          if (fillBar) fillBar.style.width = '0%';
+          if (timeSpan) timeSpan.innerText = '0:00';
+        });
+
+        if (progBar) {
+          progBar.addEventListener('click', (e) => {
+            const rect = progBar.getBoundingClientRect();
+            const clickPos = (e.clientX - rect.left) / rect.width;
+            if (audioEl.duration) {
+              audioEl.currentTime = clickPos * audioEl.duration;
+            }
+          });
+        }
       }
     }
 

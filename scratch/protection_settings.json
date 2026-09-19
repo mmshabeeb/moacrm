@@ -1,0 +1,9 @@
+{
+  "enabled": true,
+  "disableRightClick": true,
+  "disableDragAndDrop": true,
+  "disableInspectShortcuts": true,
+  "watermarkStorefrontPage": false,
+  "watermarkPageText": "MALL OF ABAYAS © ALL RIGHTS RESERVED",
+  "customWarningMessage": "Product images on Mall of Abayas are protected by copyright law."
+}

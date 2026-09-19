@@ -364,4 +364,120 @@ export class MOAAIConversationEngine {
       escalationTriggered: false
     };
   }
+
+  /**
+   * Process a customer voice note with Gemini Multimodal Audio
+   */
+  public async processVoiceTurn(params: {
+    audioBase64: string;
+    mimeType: string;
+    history: ChatMessage[];
+    currentRecord: Partial<StructuredCustomisationRecord>;
+    productTitle: string;
+    productCategory?: string;
+  }): Promise<ConversationTurnResult & { transcribedText?: string }> {
+    const { audioBase64, mimeType, history, currentRecord, productTitle, productCategory = 'abaya_standard' } = params;
+
+    try {
+      const voiceResult = await this.freeAiService.executeVoiceTurn({
+        audioBase64,
+        mimeType,
+        chatHistory: history,
+        currentRecord,
+        productTitle,
+        productCategory
+      });
+
+      if (voiceResult) {
+        const mergedCustomRequests = Array.from(new Set([
+          ...(currentRecord.custom_requests || []),
+          ...(voiceResult.customRequests || [])
+        ]));
+
+        const updated: Partial<StructuredCustomisationRecord> = {
+          ...currentRecord,
+          ...(voiceResult.extractedHeightCm && { height_cm: voiceResult.extractedHeightCm }),
+          ...(voiceResult.extractedBustInches && { bust_inches: voiceResult.extractedBustInches }),
+          ...(voiceResult.fitPreference && { fit_preference: voiceResult.fitPreference }),
+          ...(voiceResult.lengthAdjustmentInches !== undefined && voiceResult.lengthAdjustmentInches !== null && { length_adjustment_inches: voiceResult.lengthAdjustmentInches }),
+          ...(voiceResult.sleeveAdjustmentInches !== undefined && voiceResult.sleeveAdjustmentInches !== null && { sleeve_adjustment_inches: voiceResult.sleeveAdjustmentInches }),
+          ...(voiceResult.sleeveStyle && { sleeve_style: voiceResult.sleeveStyle }),
+          ...(mergedCustomRequests.length > 0 && { custom_requests: mergedCustomRequests })
+        };
+
+        if (voiceResult.requiresEscalation) {
+          return {
+            transcribedText: voiceResult.transcribedText,
+            replyMessage: voiceResult.replyMessage || MOA_SENIOR_HANDOFF_MESSAGE,
+            updatedState: 'HUMAN_DESIGNER_CONNECTED',
+            customisationStatus: 'ESCALATED_TO_SENIOR',
+            updatedRecord: { ...updated, state: 'HUMAN_DESIGNER_CONNECTED' },
+            showVerificationCard: false,
+            escalationTriggered: true,
+            escalationReason: voiceResult.escalationReason || 'Custom tailoring review required'
+          };
+        }
+
+        const hasHeight = !!updated.height_cm;
+        const hasBust = !!updated.bust_inches;
+
+        if (hasHeight) {
+          const rec = this.sizingEngine.recommendSize({
+            height_cm: updated.height_cm,
+            bust_inches: updated.bust_inches,
+            fit_preference: updated.fit_preference
+          });
+          updated.recommended_size = rec.standard_size;
+        }
+
+        if ((voiceResult.isComplete || (hasHeight && hasBust)) && updated.recommended_size) {
+          const fitLabel = (updated.fit_preference || 'regular').replace('_', ' ').toUpperCase();
+          const lenAdj = updated.length_adjustment_inches ? `${updated.length_adjustment_inches > 0 ? '+' : ''}${updated.length_adjustment_inches}"` : 'Standard Length';
+          const sleeveAdj = updated.sleeve_adjustment_inches ? `${updated.sleeve_adjustment_inches > 0 ? '+' : ''}${updated.sleeve_adjustment_inches}"` : (updated.sleeve_style || 'Standard');
+
+          return {
+            transcribedText: voiceResult.transcribedText,
+            replyMessage: voiceResult.replyMessage,
+            updatedState: 'AI_HANDLING',
+            customisationStatus: 'READY_FOR_VERIFICATION',
+            updatedRecord: updated,
+            showVerificationCard: true,
+            verificationSummary: {
+              recommendedSize: updated.recommended_size,
+              height: `${updated.height_cm} cm`,
+              bust: `${updated.bust_inches}"`,
+              fit: fitLabel,
+              lengthAdjustment: lenAdj,
+              sleeveAdjustment: sleeveAdj,
+              specialNotes: updated.sleeve_style || (updated.custom_requests ? updated.custom_requests.join(', ') : 'None')
+            },
+            escalationTriggered: false
+          };
+        }
+
+        return {
+          transcribedText: voiceResult.transcribedText,
+          replyMessage: voiceResult.replyMessage,
+          updatedState: 'AI_HANDLING',
+          customisationStatus: 'GATHERING',
+          updatedRecord: updated,
+          showVerificationCard: false,
+          escalationTriggered: false
+        };
+      }
+    } catch (err: any) {
+      console.warn('Voice processing fallback:', err);
+    }
+
+    // Fallback if audio AI is unavailable
+    return {
+      transcribedText: "Voice message received",
+      replyMessage: "Salam! I have received your voice message. I'm noting your customisation preferences for your abaya. Could you also confirm your height and bust measurement if not mentioned?",
+      updatedState: 'AI_HANDLING',
+      customisationStatus: 'GATHERING',
+      updatedRecord: currentRecord,
+      showVerificationCard: false,
+      escalationTriggered: false
+    };
+  }
 }

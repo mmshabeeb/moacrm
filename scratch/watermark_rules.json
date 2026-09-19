@@ -1,0 +1,31 @@
+[
+  {
+    "id": "251",
+    "name": "Logo",
+    "status": "active",
+    "hasTextWatermark": false,
+    "hasImageWatermark": true,
+    "imageConfig": {
+      "imageUrl": "/uploads/wm_logo_1789843259226.png",
+      "layout": "single",
+      "position": "center-right",
+      "opacity": 100,
+      "sizePx": 500,
+      "sizeUnit": "px",
+      "rotation": 0
+    },
+    "appliesTo": {
+      "products": "collection",
+      "images": "all",
+      "skipAlreadyWatermarked": true,
+      "applyToNewImages": true
+    },
+    "stats": {
+      "productsCount": 68,
+      "imagesProcessed": 204,
+      "lastAppliedAt": "2026-09-19T15:26:41.935Z"
+    },
+    "createdAt": "2026-09-12T15:26:41.935Z",
+    "updatedAt": "2026-09-19T22:34:48.418Z"
+  }
+]

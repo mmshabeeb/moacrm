@@ -610,6 +610,248 @@
   flex-shrink: 0;
 }
 
+/* WhatsApp-Style Mic Button */
+.moa-wa-mic-btn {
+  width: 38px;
+  height: 38px;
+  background: var(--moa-brand-gold-light);
+  color: var(--moa-brand-gold);
+  border: 1.5px solid var(--moa-brand-gold-border);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.moa-wa-mic-btn:hover {
+  background: var(--moa-brand-gold);
+  color: #ffffff;
+  transform: scale(1.08);
+  box-shadow: 0 4px 12px rgba(158, 109, 56, 0.25);
+}
+
+.moa-wa-mic-btn.recording {
+  background: #ff3b30 !important;
+  color: #ffffff !important;
+  border-color: #ff3b30 !important;
+  animation: moaPulseRed 1.2s infinite;
+}
+
+@keyframes moaPulseRed {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.5); }
+  70% { transform: scale(1.12); box-shadow: 0 0 0 10px rgba(255, 59, 48, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 59, 48, 0); }
+}
+
+/* WhatsApp-Style Recording Bar Overlay */
+.moa-recording-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #fdfbf9;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  z-index: 10;
+  border-radius: 0 0 16px 16px;
+  border-top: 1px solid var(--moa-border-subtle);
+  animation: moaSlideInUp 0.2s ease-out;
+}
+
+@keyframes moaSlideInUp {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.moa-rec-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.moa-rec-blink-dot {
+  width: 10px;
+  height: 10px;
+  background: #ff3b30;
+  border-radius: 50%;
+  animation: moaBlink 1s infinite alternate;
+}
+
+@keyframes moaBlink {
+  from { opacity: 1; }
+  to { opacity: 0.2; }
+}
+
+.moa-rec-timer {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #ff3b30;
+  font-family: monospace, sans-serif;
+  letter-spacing: 0.5px;
+}
+
+/* Live Waveform Animation */
+.moa-rec-waves {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 18px;
+}
+
+.moa-rec-waves span {
+  width: 3px;
+  height: 100%;
+  background: var(--moa-brand-gold);
+  border-radius: 2px;
+  animation: moaWave 0.8s ease-in-out infinite alternate;
+}
+
+.moa-rec-waves span:nth-child(2) { animation-delay: 0.15s; height: 60%; }
+.moa-rec-waves span:nth-child(3) { animation-delay: 0.3s; height: 90%; }
+.moa-rec-waves span:nth-child(4) { animation-delay: 0.45s; height: 40%; }
+.moa-rec-waves span:nth-child(5) { animation-delay: 0.6s; height: 75%; }
+
+@keyframes moaWave {
+  from { transform: scaleY(0.3); }
+  to { transform: scaleY(1); }
+}
+
+.moa-rec-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.moa-rec-cancel-btn {
+  background: #f1ede8;
+  border: none;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 20px;
+  color: #666;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.moa-rec-cancel-btn:hover {
+  background: #fee2e2;
+  color: #ef4444;
+}
+
+.moa-rec-send-btn {
+  width: 36px;
+  height: 36px;
+  background: var(--moa-brand-black);
+  color: #ffffff;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.moa-rec-send-btn:hover {
+  background: var(--moa-brand-gold);
+  transform: scale(1.05);
+}
+
+/* --------------------------------------------------------------------------
+   7.5 WhatsApp Audio Message Player Bubble
+   -------------------------------------------------------------------------- */
+.moa-voice-bubble {
+  min-width: 240px;
+  max-width: 320px;
+}
+
+.moa-audio-player {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+  margin-bottom: 4px;
+  padding: 4px 2px;
+}
+
+.moa-audio-play-btn {
+  width: 38px;
+  height: 38px;
+  background: var(--moa-brand-gold);
+  color: #ffffff;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: transform 0.1s ease, background 0.15s ease;
+}
+
+.moa-audio-play-btn:hover {
+  background: var(--moa-brand-gold-hover);
+  transform: scale(1.06);
+}
+
+.moa-audio-track {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.moa-audio-progress-bar {
+  width: 100%;
+  height: 5px;
+  background: rgba(0, 0, 0, 0.12);
+  border-radius: 3px;
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.moa-audio-progress-fill {
+  height: 100%;
+  background: var(--moa-brand-gold);
+  border-radius: 3px;
+  transition: width 0.1s linear;
+}
+
+.moa-audio-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  color: var(--moa-text-muted);
+  font-family: monospace, sans-serif;
+}
+
+.moa-audio-mic-badge {
+  font-size: 1.1rem;
+  opacity: 0.8;
+  flex-shrink: 0;
+}
+
+.moa-voice-transcript {
+  margin: 6px 0 2px 0;
+  font-size: 0.82rem;
+  color: var(--moa-text-main);
+  background: rgba(0, 0, 0, 0.04);
+  padding: 4px 8px;
+  border-radius: 6px;
+  border-left: 2px solid var(--moa-brand-gold);
+  line-height: 1.35;
+}
+
 .moa-wa-send-btn {
   width: 38px;
   height: 38px;

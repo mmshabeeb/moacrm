@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 90" width="240" height="90">
+  <defs>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E2B142"/>
+      <stop offset="50%" stop-color="#F9DE7B"/>
+      <stop offset="100%" stop-color="#B8860B"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="1" dy="2" stdDeviation="2" flood-color="#000000" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+  <g filter="url(#shadow)">
+    <!-- Monogram Circle -->
+    <circle cx="45" cy="45" r="32" fill="none" stroke="url(#gold)" stroke-width="2.5"/>
+    <circle cx="45" cy="45" r="28" fill="none" stroke="url(#gold)" stroke-width="1" stroke-dasharray="3 3"/>
+    <text x="45" y="53" font-family="'Cinzel', 'Playfair Display', Georgia, serif" font-size="26" font-weight="bold" fill="url(#gold)" text-anchor="middle">M</text>
+    
+    <!-- Wordmark -->
+    <text x="92" y="42" font-family="'Montserrat', sans-serif" font-size="16" font-weight="700" letter-spacing="3" fill="url(#gold)">MALL OF ABAYAS</text>
+    <text x="94" y="60" font-family="'Montserrat', sans-serif" font-size="10" font-weight="500" letter-spacing="4" fill="#E8D5B5">EXCLUSIVE COUTURE</text>
+    
+    <!-- Accent line -->
+    <line x1="92" y1="48" x2="225" y2="48" stroke="url(#gold)" stroke-width="0.8" opacity="0.6"/>
+  </g>
+</svg>

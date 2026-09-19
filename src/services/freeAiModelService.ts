@@ -195,6 +195,7 @@ USER: ${input.userMessage}
             const parsed = JSON.parse(responseText);
             return {
               replyMessage: parsed.replyMessage || "I've updated your bespoke measurements.",
+              intent: parsed.intent || undefined,
               extractedHeightCm: parsed.extractedHeightCm || undefined,
               extractedBustInches: parsed.extractedBustInches || undefined,
               fitPreference: parsed.fitPreference || undefined,
@@ -210,6 +211,98 @@ USER: ${input.userMessage}
           }
         } catch (err: any) {
           console.warn(`Gemini model ${candidate} failed: ${err.message}, trying next candidate...`);
+        }
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Process a voice note using Gemini's native multimodal audio capabilities
+   */
+  public async executeVoiceTurn(input: {
+    audioBase64: string;
+    mimeType: string;
+    chatHistory: Array<{ sender: 'ai' | 'user' | 'senior_designer'; text: string }>;
+    currentRecord: any;
+    productTitle: string;
+    productCategory?: string;
+  }): Promise<(FreeAiTurnOutput & { transcribedText?: string }) | null> {
+    const geminiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
+
+    if (geminiKey) {
+      const client = this.geminiClient || new GoogleGenerativeAI(geminiKey);
+      const candidateModels = [
+        this.modelName,
+        'gemini-3.6-flash',
+        'gemini-flash-latest',
+        'gemini-3.5-flash',
+        'gemini-2.5-flash-lite'
+      ].filter(Boolean);
+
+      const systemPrompt = this.getTrainedSystemPrompt(input.productTitle, input.productCategory);
+      const historyText = input.chatHistory.map(m => `${m.sender.toUpperCase()}: ${m.text}`).join('\n');
+
+      const textInstruction = `
+${systemPrompt}
+
+Current Session Measurements Recorded So Far:
+${JSON.stringify(input.currentRecord, null, 2)}
+
+Chat History:
+${historyText || 'No previous messages'}
+
+### AUDIO VOICE INSTRUCTION:
+The customer has spoken a voice message (audio attached).
+1. Listen to the audio carefully. The customer may speak in Arabic (Gulf/Khaleeji/Standard), English, Urdu, Hindi, Malayalam, French, or another language.
+2. Transcribe the customer's exact words in "transcribedText".
+3. Extract any height, bust, fit, length/sleeve adjustments, feeding zip, hidden pockets, or styling questions.
+4. Reply in "replyMessage" using the EXACT SAME LANGUAGE and dialect the customer spoke in (e.g. if they spoke Arabic, reply in Arabic; if Urdu/Hindi, reply in Urdu/Hindi; if Malayalam, reply in Malayalam; if English, reply in English).
+5. Follow the exact JSON output schema. Return ONLY valid JSON.
+`;
+
+      const audioPart = {
+        inlineData: {
+          data: input.audioBase64,
+          mimeType: input.mimeType || 'audio/webm'
+        }
+      };
+
+      for (const candidate of candidateModels) {
+        try {
+          const model = client.getGenerativeModel({
+            model: candidate,
+            generationConfig: {
+              responseMimeType: 'application/json',
+              temperature: 0.2
+            }
+          });
+
+          const result = await model.generateContent([textInstruction, audioPart]);
+          const responseText = result.response.text();
+
+          if (responseText) {
+            const parsed = JSON.parse(responseText);
+            return {
+              transcribedText: parsed.transcribedText || "Voice Message",
+              replyMessage: parsed.replyMessage || "I've listened to your voice message and updated your bespoke requirements.",
+              intent: parsed.intent || undefined,
+              extractedHeightCm: parsed.extractedHeightCm || undefined,
+              extractedBustInches: parsed.extractedBustInches || undefined,
+              fitPreference: parsed.fitPreference || undefined,
+              lengthAdjustmentInches: parsed.lengthAdjustmentInches || undefined,
+              sleeveAdjustmentInches: parsed.sleeveAdjustmentInches || undefined,
+              sleeveStyle: parsed.sleeveStyle || undefined,
+              customRequests: parsed.customRequests || [],
+              recommendedSize: parsed.recommendedSize || undefined,
+              isComplete: !!parsed.isComplete,
+              requiresEscalation: !!parsed.requiresEscalation,
+              escalationReason: parsed.escalationReason || undefined
+            };
+          }
+        } catch (err: any) {
+          console.warn(`Gemini voice turn with model ${candidate} failed: ${err.message}, trying next candidate...`);
         }
       }
     }

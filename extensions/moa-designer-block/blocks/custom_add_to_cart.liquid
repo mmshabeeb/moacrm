@@ -1,0 +1,380 @@
+<!-- 
+  ========================================================================
+  Mall of Abayas (MOA) - Luxury Custom "Add to Cart" Button (Custom Liquid)
+  Compatible with Shopify Online Store 2.0 (Dawn, Sense, Craft, Debut & Custom Themes)
+  ========================================================================
+-->
+
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+{%- assign form_id = 'product-form-' | append: product.id | append: '-' | append: section.id -%}
+
+<div class="moa-atc-wrapper" data-section-id="{{ section.id }}" data-product-id="{{ product.id }}">
+  {% form 'product', product, id: form_id, class: 'moa-atc-form', novalidate: 'novalidate', data-type: 'add-to-cart-form' %}
+    
+    <!-- Hidden Selected Variant ID -->
+    <input type="hidden" name="id" value="{{ current_variant.id }}" class="moa-variant-id-input">
+
+    <div class="moa-atc-controls">
+      <!-- 1. Quantity Selector -->
+      <div class="moa-qty-container">
+        <label for="Quantity-{{ section.id }}" class="moa-qty-label">Quantity</label>
+        <div class="moa-qty-stepper">
+          <button type="button" class="moa-qty-btn moa-qty-minus" aria-label="Decrease quantity" onclick="moaChangeQty(this, -1)">−</button>
+          <input 
+            type="number" 
+            name="quantity" 
+            id="Quantity-{{ section.id }}" 
+            value="1" 
+            min="1" 
+            max="{{ current_variant.inventory_quantity | default: 99 }}" 
+            class="moa-qty-input"
+            aria-label="Quantity"
+          >
+          <button type="button" class="moa-qty-btn moa-qty-plus" aria-label="Increase quantity" onclick="moaChangeQty(this, 1)">+</button>
+        </div>
+      </div>
+
+      <!-- 2. Main Add to Cart Action Button -->
+      <div class="moa-atc-action">
+        <button 
+          type="submit" 
+          name="add" 
+          id="moa-main-atc-btn-{{ section.id }}"
+          class="moa-btn-add-to-cart {% unless current_variant.available %}is-disabled{% endunless %}"
+          {% unless current_variant.available %}disabled{% endunless %}
+          data-default-text="Add to Bag"
+        >
+          <!-- Button Spinner -->
+          <span class="moa-btn-spinner" style="display: none;">
+            <svg class="moa-spinner-icon" viewBox="0 0 50 50">
+              <circle class="moa-spinner-path" cx="25" cy="25" r="20" fill="none" stroke-width="4"></circle>
+            </svg>
+          </span>
+
+          <!-- Button Icon -->
+          <span class="moa-btn-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <path d="M16 10a4 4 0 0 1-8 0"></path>
+            </svg>
+          </span>
+
+          <!-- Button Label -->
+          <span class="moa-btn-text">
+            {% if current_variant.available %}
+              Add to Bag • {{ current_variant.price | money }}
+            {% else %}
+              Sold Out
+            {% endif %}
+          </span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 3. Dynamic Buy It Now / Accelerated Checkout Button (Optional) -->
+    {% if block.settings.show_dynamic_checkout != false %}
+      <div class="moa-dynamic-checkout-wrapper" style="margin-top: 10px;">
+        {{ form | payment_button }}
+      </div>
+    {% endif %}
+
+    <!-- 4. Success / Error Feedback Banner -->
+    <div class="moa-atc-feedback" id="moa-feedback-{{ section.id }}" style="display: none;"></div>
+
+  {% endform %}
+</div>
+
+<!-- ========================================================================= -->
+<!-- STYLES                                                                    -->
+<!-- ========================================================================= -->
+<style>
+  .moa-atc-wrapper {
+    margin: 1.25rem 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  }
+
+  .moa-atc-controls {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+  }
+
+  /* Quantity Stepper */
+  .moa-qty-container {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .moa-qty-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #555555;
+  }
+
+  .moa-qty-stepper {
+    display: inline-flex;
+    align-items: center;
+    background: #f7f8f9;
+    border: 1px solid #d2d5d8;
+    border-radius: 30px;
+    height: 48px;
+    padding: 0 4px;
+  }
+
+  .moa-qty-btn {
+    background: transparent;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #202223;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s ease;
+  }
+
+  .moa-qty-btn:hover {
+    background: #e4e7eb;
+  }
+
+  .moa-qty-input {
+    width: 36px;
+    border: none;
+    background: transparent;
+    text-align: center;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #202223;
+    outline: none;
+    -moz-appearance: textfield;
+  }
+
+  .moa-qty-input::-webkit-outer-spin-button,
+  .moa-qty-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  /* Add to Cart Button */
+  .moa-atc-action {
+    flex: 1;
+  }
+
+  .moa-btn-add-to-cart {
+    width: 100%;
+    height: 48px;
+    background: #1c1c1c; /* Luxury Dark / Atelier Black */
+    color: #ffffff;
+    border: none;
+    border-radius: 30px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 0 24px;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .moa-btn-add-to-cart:hover:not(:disabled) {
+    background: #332b2a;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+  }
+
+  .moa-btn-add-to-cart:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  .moa-btn-add-to-cart.is-disabled,
+  .moa-btn-add-to-cart:disabled {
+    background: #c9cccf;
+    color: #8c9196;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+  }
+
+  /* Gated Customisation Locked State (MOA Assistant) */
+  .moa-btn-add-to-cart.is-locked {
+    background: #8b5a2b !important; /* Gold / Bronze atelier lock */
+    color: #ffffff !important;
+    cursor: pointer;
+  }
+
+  .moa-btn-icon {
+    display: flex;
+    align-items: center;
+  }
+
+  /* Loading Spinner */
+  .moa-spinner-icon {
+    animation: moa-rotate 1.5s linear infinite;
+    width: 20px;
+    height: 20px;
+  }
+
+  .moa-spinner-path {
+    stroke: #ffffff;
+    stroke-linecap: round;
+    animation: moa-dash 1.5s ease-in-out infinite;
+  }
+
+  @keyframes moa-rotate {
+    100% { transform: rotate(360deg); }
+  }
+
+  @keyframes moa-dash {
+    0% { stroke-dasharray: 1, 150; stroke-dashoffset: 0; }
+    50% { stroke-dasharray: 90, 150; stroke-dashoffset: -35; }
+    100% { stroke-dasharray: 90, 150; stroke-dashoffset: -124; }
+  }
+
+  /* Feedback Banner */
+  .moa-atc-feedback {
+    margin-top: 10px;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+
+  .moa-atc-feedback.is-success {
+    background: #edf8f3;
+    color: #008060;
+    border: 1px solid #aee9d1;
+  }
+
+  .moa-atc-feedback.is-error {
+    background: #fff4f2;
+    color: #d82c0d;
+    border: 1px solid #f1a9a0;
+  }
+
+  @media (max-width: 480px) {
+    .moa-atc-controls {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .moa-qty-stepper {
+      justify-content: center;
+    }
+  }
+</style>
+
+<!-- ========================================================================= -->
+<!-- JAVASCRIPT LOGIC (AJAX CART & DRAWER INTEGRATION)                         -->
+<!-- ========================================================================= -->
+<script>
+  function moaChangeQty(button, delta) {
+    const stepper = button.closest('.moa-qty-stepper');
+    const input = stepper.querySelector('.moa-qty-input');
+    let val = parseInt(input.value) || 1;
+    val += delta;
+    if (val < 1) val = 1;
+    const max = parseInt(input.getAttribute('max')) || 99;
+    if (val > max) val = max;
+    input.value = val;
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('{{ form_id }}');
+    if (!form) return;
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const btn = form.querySelector('.moa-btn-add-to-cart');
+      const btnText = btn.querySelector('.moa-btn-text');
+      const btnIcon = btn.querySelector('.moa-btn-icon');
+      const btnSpinner = btn.querySelector('.moa-btn-spinner');
+      const feedback = document.getElementById('moa-feedback-{{ section.id }}');
+
+      // 1. Check if locked by MOA Customisation Gating
+      if (btn.classList.contains('is-locked')) {
+        if (window.MOA_WIDGET && typeof window.MOA_WIDGET.openPanel === 'function') {
+          window.MOA_WIDGET.openPanel();
+        }
+        return;
+      }
+
+      if (btn.disabled) return;
+
+      // 2. Set loading state
+      btn.disabled = true;
+      btnSpinner.style.display = 'inline-flex';
+      btnIcon.style.display = 'none';
+      const originalText = btnText.textContent;
+      btnText.textContent = 'Adding to Bag...';
+      feedback.style.display = 'none';
+
+      // 3. Prepare Form Data
+      const formData = new FormData(form);
+
+      try {
+        const response = await fetch('/cart/add.js', {
+          method: 'POST',
+          headers: { 'Accept': 'application/json' },
+          body: formData
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          // Success State
+          btnText.textContent = '✓ Added to Bag!';
+          btn.style.background = '#008060';
+
+          // Open theme cart drawer if present
+          document.dispatchEvent(new CustomEvent('cart:refresh'));
+          document.dispatchEvent(new CustomEvent('cart-update'));
+          document.dispatchEvent(new CustomEvent('cart-drawer:open'));
+
+          // Check for Dawn theme cart drawer
+          const cartDrawer = document.querySelector('cart-drawer');
+          if (cartDrawer && typeof cartDrawer.open === 'function') {
+            cartDrawer.open(btn);
+          }
+
+          setTimeout(() => {
+            btnText.textContent = originalText;
+            btn.style.background = '';
+            btn.disabled = false;
+            btnSpinner.style.display = 'none';
+            btnIcon.style.display = 'inline-flex';
+          }, 2000);
+
+        } else {
+          // Error State
+          throw new Error(data.description || 'Could not add item to cart.');
+        }
+
+      } catch (err) {
+        console.error('MOA ATC Error:', err);
+        feedback.textContent = err.message || 'Error adding to cart. Please try again.';
+        feedback.className = 'moa-atc-feedback is-error';
+        feedback.style.display = 'block';
+
+        btnText.textContent = originalText;
+        btn.disabled = false;
+        btnSpinner.style.display = 'none';
+        btnIcon.style.display = 'inline-flex';
+      }
+    });
+  });
+</script>
