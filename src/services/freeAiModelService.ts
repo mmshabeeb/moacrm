@@ -41,7 +41,7 @@ export class FreeAiModelService {
 
   constructor() {
     this.provider = process.env.AI_PROVIDER || 'gemini';
-    this.modelName = process.env.AI_MODEL_NAME || 'gemini-3.6-flash';
+    this.modelName = process.env.AI_MODEL_NAME || 'gemini-1.5-flash';
 
     const geminiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
     if (geminiKey) {
@@ -156,10 +156,10 @@ ${JSON.stringify(addonsData.addons, null, 2)}
       const client = this.geminiClient || new GoogleGenerativeAI(geminiKey);
       const candidateModels = [
         this.modelName,
-        'gemini-3.6-flash',
-        'gemini-flash-latest',
-        'gemini-3.5-flash',
-        'gemini-2.5-flash-lite'
+        'gemini-1.5-flash',
+        'gemini-2.0-flash',
+        'gemini-1.5-pro',
+        'gemini-1.5-flash-latest'
       ].filter(Boolean);
 
       const systemPrompt = this.getTrainedSystemPrompt(input.productTitle, input.productCategory);
@@ -235,10 +235,10 @@ USER: ${input.userMessage}
       const client = this.geminiClient || new GoogleGenerativeAI(geminiKey);
       const candidateModels = [
         this.modelName,
-        'gemini-3.6-flash',
-        'gemini-flash-latest',
-        'gemini-3.5-flash',
-        'gemini-2.5-flash-lite'
+        'gemini-1.5-flash',
+        'gemini-2.0-flash',
+        'gemini-1.5-pro',
+        'gemini-1.5-flash-latest'
       ].filter(Boolean);
 
       const systemPrompt = this.getTrainedSystemPrompt(input.productTitle, input.productCategory);
@@ -262,10 +262,11 @@ The customer has spoken a voice message (audio attached).
 5. Follow the exact JSON output schema. Return ONLY valid JSON.
 `;
 
+      const cleanMime = (input.mimeType || 'audio/webm').split(';')[0].trim();
       const audioPart = {
         inlineData: {
           data: input.audioBase64,
-          mimeType: input.mimeType || 'audio/webm'
+          mimeType: cleanMime
         }
       };
 
